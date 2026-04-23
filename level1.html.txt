@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>STB-ARCHIVE // LEVEL 1</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .document { background: #021C02; padding: 1rem; margin: 1rem 0; border-left: 4px solid #0F0; }
+        .hint { font-size: 0.8rem; margin-top: 2rem; color: #6F6; }
+    </style>
+</head>
+<body>
+<div class="terminal">
+    <h2>[ УРОВЕНЬ ДОПУСКА: НОВИЦИЙ ]</h2>
+    <div class="document">
+        <h3>ОСНОВАНИЕ // КОММЕРЧЕСКАЯ СТРУКТУРА</h3>
+        <p><strong>Дата:</strong> 1986 год. <strong>Место:</strong> Женева, Швейцария.<br>
+        Инициаторы — пул частных инвесторов. Цель — влияние на рынки без участия государств.</p>
+    </div>
+    <div class="document">
+        <h3>ПЕРВЫЕ ОПЕРАЦИИ</h3>
+        <p>Устранение конкурентов, дестабилизация режимов, кибершпионаж.</p>
+    </div>
+    <div class="hint">Первый контакт с аномалией — 1998 год. Уровень 2.</div>
+    <div><a href="index.html">← Вернуться</a></div>
+</div>
+</body>
+</html>
