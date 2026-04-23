@@ -1,28 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>STB-ARCHIVE // LEVEL 1</title>
+    <title>STB-ARCHIVE // Уровень 1: Новиций</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .document { background: #021C02; padding: 1rem; margin: 1rem 0; border-left: 4px solid #0F0; }
-        .hint { font-size: 0.8rem; margin-top: 2rem; color: #6F6; }
+        .warning { color: #F44; }
+        .redacted { background: black; color: black; user-select: none; }
+        .tab { display: inline-block; padding: 0.5rem 1rem; background: #000; border: 1px solid #0F0; cursor: pointer; }
+        .tab.active { background: #0F0; color: #000; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
 <div class="terminal">
     <h2>[ УРОВЕНЬ ДОПУСКА: НОВИЦИЙ ]</h2>
-    <div class="document">
-        <h3>ОСНОВАНИЕ // КОММЕРЧЕСКАЯ СТРУКТУРА</h3>
-        <p><strong>Дата:</strong> 1986 год. <strong>Место:</strong> Женева, Швейцария.<br>
-        Инициаторы — пул частных инвесторов. Цель — влияние на рынки без участия государств.</p>
+    <div class="tabs">
+        <div class="tab active" data-tab="origin">Основание</div>
+        <div class="tab" data-tab="laws">Три Закона</div>
+        <div class="tab" data-tab="structure">Иерархия</div>
     </div>
-    <div class="document">
-        <h3>ПЕРВЫЕ ОПЕРАЦИИ</h3>
-        <p>Устранение конкурентов, дестабилизация режимов, кибершпионаж.</p>
+
+    <div id="origin" class="tab-content active">
+        <div class="document">
+            <h3>Меморандум о создании</h3>
+            <p><strong>Дата:</strong> 1986 год, Женева.<br>
+            <strong>Инициаторы:</strong> пул частных инвесторов (сырьевые корпорации, теневые банкиры).<br>
+            Цель — создание независимой структуры для управления глобальными рисками без участия государств.</p>
+            <p>Первоначальное название — «Группа Семь». В 1988 году переименована в STABILIS.</p>
+            <p class="warning">⚠️ В 1998 году зафиксирован первый контакт с аномалией. Подробности — на уровне 2.</p>
+        </div>
+        <div class="document">
+            <h3>Легенда прикрытия</h3>
+            <p>Фонд глобальной логистики и прогнозирования катастроф. Официально занимается гуманитарными проектами. Реальная деятельность — засекречена.</p>
+        </div>
     </div>
-    <div class="hint">Первый контакт с аномалией — 1998 год. Уровень 2.</div>
-    <div><a href="index.html">← Вернуться</a></div>
+
+    <div id="laws" class="tab-content">
+        <div class="document">
+            <h3>Три Закона STABILIS (внутренняя редакция)</h3>
+            <ol>
+                <li><strong>Закон Порога:</strong> Вмешательство только при вероятности отклонения Базового Сценария ≥87% (оценка ИИ «Глобальный Прогноз»).</li>
+                <li><strong>Закон Минимального Следа:</strong> После вмешательства реальность должна быть неотличима от сценария, где вмешательства не было. Свидетели — амнезия или несчастный случай.</li>
+                <li><strong>Закон Аполитичности:</strong> Организация не навязывает идеологий. Государства — лишь слои реальности, их изменение не наша забота.</li>
+            </ol>
+        </div>
+    </div>
+
+    <div id="structure" class="tab-content">
+        <div class="document">
+            <h3>Иерархия (уровни доступа)</h3>
+            <ul>
+                <li>Уровень 0 — Гептархи (неизвестны)</li>
+                <li>Уровень 1 — Новиций (вы здесь)</li>
+                <li>Уровень 2 — Оператор</li>
+                <li>Уровень 3 — Архитектор</li>
+                <li>Уровень 4 — Легат</li>
+                <li>Уровень 5 — Инквизитор</li>
+                <li>Уровень 6 — Умбра</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="hint" style="margin-top:2rem;">🔑 Следующий код: KAIROS-01 (найдите в спектрограмме видео 2)</div>
+    <div><a href="index.html">← Вернуться к терминалу</a></div>
 </div>
+<script>
+    // Простые вкладки
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.getAttribute('data-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            contents.forEach(c => c.classList.remove('active'));
+            document.getElementById(target).classList.add('active');
+        });
+    });
+</script>
 </body>
 </html>
