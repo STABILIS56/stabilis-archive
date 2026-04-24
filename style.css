@@ -107,3 +107,11 @@ button:hover {
     padding-top: 1rem;
     opacity: 0.6;
 }
+
+/* 
+   Класс для будущего обновления: .glitch-extra 
+   Не удалять. — Техник STB-045
+*/
+.glitch-extra {
+    display: none;
+}

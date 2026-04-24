@@ -1,4 +1,24 @@
-// Словарь простых кодов (одна строка) -> страница
+// ------------------------------
+// STABILIS ARCHIVE SCRIPT v.3.1.7
+// Последние изменения: 2026/04/24
+// ------------------------------
+
+// Консольные пасхалки
+console.log("%c[STB-ARCHIVE] %cСистема загрузки завершена. Уровень допуска: 0", "color: #0F0", "color: #6F6");
+console.log("%c[WARNING] %cОбнаружен неавторизованный доступ к консоли. Ваш ID будет зафиксирован.", "color: #F44", "color: #CCC");
+console.log("%c[DEBUG] %cЕсли вы это видите, значит, вы знаете, что искать. Ищите дальше.", "color: #F0F", "color: #AAA");
+console.log("%c-----//-----//-----", "color: #0F0");
+console.log("b64: aHR0cHM6Ly9zdGFiaWxpc2FyY2hpdmUuY29tL2Zha2U=");
+console.log("%c-----//-----//-----", "color: #0F0");
+
+// Скрытая команда для консоли (зашифрована base64)
+const HIDDEN_CONSOLE_CODE = atob("U0lMRU5USVVNLU9WRVJUVVJF"); // SILENTIUM-OVERTURE
+
+// Имитация счётчика сессии
+let fakeSessionID = Math.floor(Math.random() * 0xFFFF).toString(16);
+console.log(`%c[STB] %cСессия: ${fakeSessionID}`, "color: #0F0", "color: #6F6");
+
+// ----- ОБЫЧНЫЕ КОДЫ ДЛЯ УРОВНЕЙ -----
 const simpleCodes = {
     "OLIG-1986": "level1.html",
     "KAIROS-01": "level2.html",
@@ -8,50 +28,56 @@ const simpleCodes = {
     "FER-KAI": "level6.html"
 };
 
-// Комбинированные коды (например, из двух видео)
 const comboMap = {
-    "SGP-1967+KAIROS-01": "level3.html",    // доступ к уровню 3 через комбинацию кодов видео 1 и 2
-    "GAMMA-87+FER-67": "level5.html",       // доступ к уровню 5
+    "OLIG-1986+KAIROS-01": "level3.html",
+    "GAMMA-87+FER-67": "level5.html",
     "OLIG-1986+AUSPEX-22": "level4.html"
 };
 
-// Секретный код для level0 (длинная комбинация из 4 частей)
-const secretCode = "87B-THETA-UMBRA-SILENTIUM";
+const secretCodeStandard = "87B-THETA-UMBRA-SILENTIUM";
 
 let failedAttempts = 0;
+
+function handleNormalAuth(code) {
+    if (code === secretCodeStandard) {
+        window.location.href = "level0.html";
+        return true;
+    }
+    if (comboMap[code]) {
+        window.location.href = comboMap[code];
+        return true;
+    }
+    if (simpleCodes[code]) {
+        window.location.href = simpleCodes[code];
+        return true;
+    }
+    return false;
+}
 
 document.getElementById("authBtn").addEventListener("click", function() {
     const code = document.getElementById("accessCode").value.trim().toUpperCase();
     const errorDiv = document.getElementById("errorMsg");
+    errorDiv.innerText = "";
 
-    // Сначала проверяем секретный код
-    if (code === secretCode) {
-        window.location.href = "level0.html";
+    // Пасхалка: если ввести команду из консоли, то вывести сообщение в консоль
+    if (code === HIDDEN_CONSOLE_CODE) {
+        console.log("%c[STB] %cКоманда распознана. Но здесь ничего нет. Попробуйте в другом месте.", "color: #0F0", "color: #FFF");
+        document.getElementById("accessCode").value = "";
         return;
     }
 
-    // Проверяем комбинированные коды
-    if (comboMap[code]) {
-        window.location.href = comboMap[code];
+    if (handleNormalAuth(code)) {
+        document.getElementById("accessCode").value = "";
         return;
     }
 
-    // Проверяем простые коды
-    if (simpleCodes[code]) {
-        window.location.href = simpleCodes[code];
-        return;
-    }
-
-    // Если код неверный
+    // Неверный код
     failedAttempts++;
-    errorDiv.innerText = `ACCESS DENIED // LOGGED (попытка ${failedAttempts})`;
+    errorDiv.innerText = `ACCESS DENIED // LOGGED (ПОПЫТКА ${failedAttempts})`;
     if (failedAttempts >= 3) {
-        errorDiv.innerText += " // ПРЕВЫШЕН ЛИМИТ. АКТИВИРОВАН ПРОТОКОЛ ТЕНИ.";
+        errorDiv.innerText += " // ПРОТОКОЛ ТЕНИ АКТИВИРОВАН";
         if (failedAttempts >= 5) {
-            // После 5 неудач перенаправляем на страницу "доступ заблокирован"
-            setTimeout(() => {
-                window.location.href = "access_denied.html";
-            }, 2000);
+            setTimeout(() => { window.location.href = "access_denied.html"; }, 2000);
         } else {
             setTimeout(() => { errorDiv.innerText = ""; }, 4000);
         }
@@ -66,3 +92,8 @@ document.getElementById("accessCode").addEventListener("keypress", function(e) {
         document.getElementById("authBtn").click();
     }
 });
+
+// Имитация активности в консоли (каждые 30 секунд, если консоль открыта)
+setInterval(() => {
+    console.log("%c[STB] %cСессия активна. Время: " + new Date().toLocaleTimeString(), "color: #0F0", "color: #6F6");
+}, 30000);
