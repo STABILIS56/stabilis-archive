@@ -59,6 +59,11 @@
             cursor: pointer;
             font-family: monospace;
         }
+        .error {
+            color: #F44;
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
         .main-layout {
             display: flex;
             flex: 1;
@@ -121,31 +126,13 @@
             margin-bottom: 0.5rem;
             border-bottom: 1px dashed #0F0;
         }
-        .log-line {
-            font-family: monospace;
-            white-space: pre-wrap;
-            margin-bottom: 0.2rem;
-        }
-        .error-msg {
-            color: #F44;
-            margin: 0.5rem 0;
-            font-weight: bold;
-        }
-        .success-msg {
-            color: #0F0;
-            margin: 0.5rem 0;
-        }
         .legend span {
             display: inline-block;
             width: 20px;
             height: 20px;
             margin-right: 5px;
         }
-        /* Скрываем стандартную атрибуцию Leaflet/OSM */
-        .leaflet-control-attribution {
-            display: none !important;
-        }
-        /* Стиль для нашей кастомной атрибуции */
+        .leaflet-control-attribution { display: none !important; }
         .custom-attribution {
             font-size: 8px;
             background-color: rgba(0,0,0,0.7);
@@ -155,10 +142,6 @@
             border-radius: 4px;
             border: 1px solid #0F0;
             pointer-events: none;
-        }
-        .custom-attribution a, .custom-attribution a:visited {
-            color: #0F0;
-            text-decoration: none;
         }
     </style>
 </head>
@@ -178,23 +161,23 @@
             <div class="menu-item" data-tab="map" id="mapLocked">КАРТА УГРОЗ</div>
             <div class="menu-item" data-tab="chat" id="chatLocked">КАНАЛ СВЯЗИ (ЧАТ)</div>
         </div>
-        <div class="content" id="dynamicContent">
-            <div class="tab-pane active" id="tab-terminal">
+        <div class="content">
+            <div id="tab-terminal" class="tab-pane active">
                 <h3>[ СИСТЕМА ОНЛАЙН ]</h3>
                 <p>Добро пожаловать в терминал удалённого доступа STABILIS. Введите код доступа для открытия дополнительных разделов.</p>
                 <p>Доступные команды: HELP, STATUS, CLEAR</p>
                 <pre>$ &gt; _</pre>
             </div>
-            <div class="tab-pane" id="tab-archive">
+            <div id="tab-archive" class="tab-pane">
                 <h3>АРХИВ STABILIS // ДОКУМЕНТЫ</h3>
                 <div id="archiveContent">Введите код доступа для просмотра документов.</div>
             </div>
-            <div class="tab-pane" id="tab-map">
+            <div id="tab-map" class="tab-pane">
                 <h3>ГЛОБАЛЬНАЯ КАРТА УГРОЗ И ОПЕРАЦИЙ</h3>
                 <div id="map-container"></div>
                 <div class="legend"><span style="background:red;"></span> Аномалия &nbsp; <span style="background:#0F0;"></span> Операция STABILIS</div>
             </div>
-            <div class="tab-pane" id="tab-chat">
+            <div id="tab-chat" class="tab-pane">
                 <h3>КАНАЛ СВЯЗИ // НЕОФИЦИАЛЬНЫЙ ЛОГ</h3>
                 <div id="chatContent" class="chat-log">Доступ ограничен. Введите код доступа.</div>
             </div>
@@ -203,35 +186,102 @@
     <div class="footer">СЕАНС ЗАЛОГИРОВАН. АКТИВНОСТЬ МОНИТОРИТСЯ.</div>
 </div>
 
+<div id="errorMsg" class="error" style="position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: black; padding: 0.5rem; border: 1px solid #F44; z-index: 1000;"></div>
+
 <script src="script.js"></script>
 <script>
-    // Дополнительная логика для вкладок и загрузки контента (не конфликтует с script.js)
-    // Здесь мы просто дополняем, но основная обработка кодов остаётся в script.js.
-    // Чтобы избежать двойного определения, весь код перенесён в script.js.
-    // А этот блок будет отвечать за переключение вкладок.
-    const menuItems = document.querySelectorAll('.menu-item');
-    const panes = document.querySelectorAll('.tab-pane');
-    menuItems.forEach(item => {
-        item.addEventListener('click', () => {
-            if (item.classList.contains('locked')) {
-                const container = document.getElementById('dynamicContent');
-                const msg = document.createElement('div');
-                msg.className = 'error-msg';
-                msg.textContent = '[СИСТЕМА] ДОСТУП ЗАПРЕЩЁН. Требуется авторизация.';
-                container.appendChild(msg);
-                setTimeout(() => msg.remove(), 3000);
-                return;
+    // Логика переключения вкладок и загрузки контента (дополнительная, не конфликтует с script.js)
+    (function() {
+        const archiveLocked = document.getElementById('archiveLocked');
+        const mapLocked = document.getElementById('mapLocked');
+        const chatLocked = document.getElementById('chatLocked');
+        const menuItems = document.querySelectorAll('.menu-item');
+        const panes = document.querySelectorAll('.tab-pane');
+
+        function updateLockedState() {
+            // Эти функции будут вызываться из script.js при вводе кодов
+            if (window.codesEntered) {
+                if (window.codesEntered.archive) archiveLocked.classList.remove('locked');
+                else archiveLocked.classList.add('locked');
+                if (window.codesEntered.map) mapLocked.classList.remove('locked');
+                else mapLocked.classList.add('locked');
+                if (window.codesEntered.chat) chatLocked.classList.remove('locked');
+                else chatLocked.classList.add('locked');
             }
-            const tabId = item.getAttribute('data-tab');
-            panes.forEach(pane => pane.classList.remove('active'));
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-            if (tabId === 'map' && !window.mapInitialized) {
-                // Инициализация карты (если не инициализирована)
-                if (typeof initGlobalMap === 'function') initGlobalMap();
-            }
+        }
+
+        // Переключение вкладок
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if (item.classList.contains('locked')) {
+                    const errorDiv = document.getElementById('errorMsg');
+                    errorDiv.innerText = '[СИСТЕМА] ДОСТУП ЗАПРЕЩЁН. Требуется авторизация.';
+                    setTimeout(() => errorDiv.innerText = '', 3000);
+                    return;
+                }
+                const tabId = item.getAttribute('data-tab');
+                panes.forEach(pane => pane.classList.remove('active'));
+                document.getElementById(`tab-${tabId}`).classList.add('active');
+                if (tabId === 'map' && window.mapInitialized === false && typeof initGlobalMap === 'function') initGlobalMap();
+                if (tabId === 'chat' && window.chatLoaded === false && typeof loadChatContent === 'function') loadChatContent();
+            });
         });
-    });
-    document.querySelector('.menu-item[data-tab="terminal"]').classList.add('active-tab');
+
+        // Обновление состояния при изменении codesEntered (будет вызываться из script.js)
+        window.updateMenuLock = updateLockedState;
+        setInterval(updateLockedState, 500); // периодическая проверка
+
+        // Инициализация карты (функция, которую может вызвать script.js)
+        window.initGlobalMap = function() {
+            if (window.mapInitialized) return;
+            const container = document.getElementById('map-container');
+            if (!container) return;
+            const map = L.map('map-container').setView([45.0, 10.0], 3);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: false,
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+            const locations = [
+                { lat: 42.0, lng: 21.0, type: 'anomaly', title: 'Бета-01', desc: 'Балканы, 1998. Первый контакт.' },
+                { lat: 48.0, lng: -30.0, type: 'anomaly', title: 'Гамма-04', desc: 'Северная Атлантика. Аномалия изолирована, 2002.' },
+                { lat: 46.2, lng: 6.15, type: 'event', title: 'Основание STABILIS', desc: 'Женева, 1986.' },
+                { lat: 41.9, lng: 12.5, type: 'event', title: 'Операция "Спокойное море"', desc: 'Рим, 2006.' },
+                { lat: 55.75, lng: 37.62, type: 'event', title: 'Внедрение агента Ауспиций', desc: 'Москва, 2004.' }
+            ];
+            locations.forEach(loc => {
+                const markerColor = loc.type === 'anomaly' ? 'red' : '#0F0';
+                const icon = L.divIcon({
+                    html: `<div style="background:${markerColor}; width:12px; height:12px; border-radius:50%; border:1px solid white;"></div>`,
+                    iconSize: [14,14],
+                    popupAnchor: [0,-5]
+                });
+                const marker = L.marker([loc.lat, loc.lng], { icon }).addTo(map);
+                marker.bindPopup(`<b>${loc.title}</b><br>${loc.desc}`);
+            });
+            let customAttr = L.control({ position: 'bottomright' });
+            customAttr.onAdd = function() {
+                let div = L.DomUtil.create('div', 'custom-attribution');
+                div.innerHTML = 'Картографические данные: Сектор STB-ANALYTICS (OpenStreetMap) • ODbL';
+                return div;
+            };
+            customAttr.addTo(map);
+            window.mapInitialized = true;
+        };
+
+        window.loadChatContent = function() {
+            const chatDiv = document.getElementById('chatContent');
+            if (chatDiv && chatDiv.innerHTML.includes('Доступ ограничен')) {
+                chatDiv.innerHTML = `
+                    <div class="chat-message">[2005-04-12 09:23] tech_045: Сервер опять перегружен. Кто запустил массовый анализ?</div>
+                    <div class="chat-message">[2005-04-12 09:25] arch_41: Это Глобальный Прогноз, новая модель. Ждите.</div>
+                    <div class="chat-message">[2005-04-12 09:30] kairos_07: Помните операцию "Кукольник"? До сих пор кошмары.</div>
+                    <div class="chat-message">[2005-04-12 09:32] auspex_03: Ходят слухи о секторе Umbra-X. Кто-нибудь в курсе?</div>
+                `;
+                window.chatLoaded = true;
+            }
+        };
+    })();
 </script>
 </body>
 </html>

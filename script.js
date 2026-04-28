@@ -21,6 +21,9 @@ const secretCodeStandard = "87B-THETA-UMBRA-SILENTIUM";
 
 let failedAttempts = 0;
 
+// Глобальные переменные для состояния разделов
+window.codesEntered = { archive: false, map: false, chat: false };
+
 document.getElementById("authBtn").addEventListener("click", function() {
     const code = document.getElementById("accessCode").value.trim().toUpperCase();
     const errorDiv = document.getElementById("errorMsg");
@@ -63,3 +66,9 @@ document.getElementById("accessCode").addEventListener("keypress", function(e) {
         document.getElementById("authBtn").click();
     }
 });
+
+// Дополнительно: обрабатываем коды, которые разблокируют вкладки (не перенаправляют, а разблокируют)
+// Это нужно, если ты хочешь, чтобы код не уводил на другую страницу, а открывал раздел на текущей.
+// Но в текущей логике все коды ведут на отдельные HTML-файлы (level1.html и т.д.).
+// Для разблокировки вкладок нужно, чтобы в simpleCodes не было таких кодов, а была отдельная обработка.
+// Пока оставим как есть.
