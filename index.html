@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* Базовые стили терминала */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: radial-gradient(circle at center, #021C02 0%, #000000 100%);
@@ -136,6 +135,12 @@
             color: #0F0;
             margin: 0.5rem 0;
         }
+        .legend span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
@@ -154,27 +159,19 @@
             <div class="menu-item" data-tab="map" id="mapLocked">КАРТА УГРОЗ</div>
             <div class="menu-item" data-tab="chat" id="chatLocked">КАНАЛ СВЯЗИ (ЧАТ)</div>
         </div>
-        <div class="content" id="dynamicContent">
-            <!-- Здесь будет отображаться активная вкладка -->
-        </div>
+        <div class="content" id="dynamicContent"></div>
     </div>
     <div class="footer">СЕАНС ЗАЛОГИРОВАН. АКТИВНОСТЬ МОНИТОРИТСЯ.</div>
 </div>
 
 <script>
-    // Состояние доступов
     let codesEntered = { archive: false, map: false, chat: false };
     let mapInitialized = false;
     let map = null;
+    let currentTab = 'terminal';
 
-    // Вспомогательная функция для показа логов загрузки
     function showLoader(container, callback) {
-        const startTime = Date.now();
-        let lines = [
-            "[SYSTEM] Инициализация модуля...",
-            "[SYSTEM] Проверка прав доступа...",
-            "[SYSTEM] Загрузка данных..."
-        ];
+        let lines = ["[SYSTEM] Инициализация модуля...", "[SYSTEM] Проверка прав доступа...", "[SYSTEM] Загрузка данных..."];
         let i = 0;
         container.innerHTML = "";
         const interval = setInterval(() => {
@@ -186,22 +183,18 @@
                 i++;
             } else {
                 clearInterval(interval);
-                // небольшая задержка для имитации работы
-                setTimeout(() => {
-                    container.innerHTML = ""; // очищаем логи
-                    callback(container);
-                }, 300);
+                setTimeout(() => { container.innerHTML = ""; callback(container); }, 300);
             }
         }, 400);
     }
 
-    // Функция отрисовки вкладок
     function renderTab(tabId) {
         const container = document.getElementById('dynamicContent');
-        container.innerHTML = ""; // очищаем
+        container.innerHTML = "";
+        currentTab = tabId;
         if (tabId === 'terminal') {
             container.innerHTML = `
-                <div class="tab-pane active" id="activePane">
+                <div class="tab-pane active">
                     <h3>[ СИСТЕМА ОНЛАЙН ]</h3>
                     <p>Добро пожаловать в терминал удалённого доступа STABILIS. Введите код доступа для открытия дополнительных разделов.</p>
                     <p>Доступные команды: HELP, STATUS, CLEAR</p>
@@ -237,7 +230,6 @@
             showLoader(container, (cont) => {
                 cont.innerHTML = `<h3>ГЛОБАЛЬНАЯ КАРТА УГРОЗ И ОПЕРАЦИЙ</h3><div id="map-container"></div><div class="legend"><span style="background:red;"></span> Аномалия &nbsp; <span style="background:#0F0;"></span> Операция STABILIS</div>`;
                 if (!mapInitialized) {
-                    // Инициализация карты
                     const mapContainer = document.getElementById('map-container');
                     if (mapContainer) {
                         map = L.map('map-container').setView([45.0, 10.0], 3);
@@ -245,10 +237,10 @@
                             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                             subdomains: 'abc'
                         }).addTo(map);
+                        // ========== МАССИВ МЕТОК С ИСПРАВЛЕННЫМИ КООРДИНАТАМИ ==========
                         const locations = [
-                            { lat: 45.56, lng: 7.26, type: 'anomaly', title: 'Гамма-04', desc: 'Подводный объект. Северная Атлантика. Изолирован.' },
-                            { lat: 51.0, lng: 30.0, type: 'anomaly', title: 'Бета-12', desc: 'Чернобыльская зона. Периодическая активность.' },
-                            { lat: 42.0, lng: 21.0, type: 'anomaly', title: 'Бета-01', desc: 'Балканы, 1998. Первый контакт.' },
+                            { lat: 42.0, lng: 21.0, type: 'anomaly', title: 'Бета-01 (операция "Кукольник")', desc: 'Балканы, 1998. Первый контакт.' },
+                            { lat: 48.0, lng: -30.0, type: 'anomaly', title: 'Гамма-04', desc: 'Северная Атлантика. Аномалия изолирована.' },
                             { lat: 46.2, lng: 6.15, type: 'event', title: 'Основание STABILIS', desc: 'Женева, 1986.' },
                             { lat: 41.9, lng: 12.5, type: 'event', title: 'Операция "Тихая пристань"', desc: 'Рим, 2019.' },
                             { lat: 55.75, lng: 37.62, type: 'event', title: 'Внедрение агента Ауспиций', desc: 'Москва.' }
@@ -269,7 +261,6 @@
                         mapInitialized = true;
                     }
                 } else {
-                    // если карта уже была инициализирована, просто обновляем размер (invalidateSize)
                     setTimeout(() => { if (map) map.invalidateSize(); }, 100);
                 }
             });
@@ -293,7 +284,6 @@
         }
     }
 
-    // Функция обновления состояния меню (блокировка/разблокировка)
     function updateMenu() {
         const archiveItem = document.getElementById('archiveLocked');
         const mapItem = document.getElementById('mapLocked');
@@ -321,57 +311,38 @@
         }
     }
 
-    // Обработчик ввода глобального кода
     document.getElementById('authBtn').addEventListener('click', () => {
         const codeInput = document.getElementById('globalCode');
         const code = codeInput.value.trim().toUpperCase();
-        const errorDiv = document.getElementById('dynamicContent');
+        const container = document.getElementById('dynamicContent');
         if (code === 'OLIG-1986') {
             codesEntered.archive = true;
             updateMenu();
-            // Показать сообщение в текущей вкладке
-            if (document.querySelector('.menu-item[data-tab="archive"]').classList.contains('locked')) {
-                // ничего, но если архив уже выбран? не важно
-            }
-            // выведем сообщение в активную панель (но не будем перегружать)
-            const currentTab = getCurrentTab();
+            const msg = document.createElement('div');
+            msg.className = 'success-msg';
+            msg.textContent = '[СИСТЕМА] Доступ к архиву разблокирован.';
+            container.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
             if (currentTab === 'archive') renderTab('archive');
-            else {
-                // просто покажем уведомление
-                const container = document.getElementById('dynamicContent');
-                const msg = document.createElement('div');
-                msg.className = 'success-msg';
-                msg.textContent = '[СИСТЕМА] Доступ к архиву разблокирован.';
-                container.appendChild(msg);
-                setTimeout(() => msg.remove(), 3000);
-            }
         } else if (code === 'KAIROS-01') {
             codesEntered.map = true;
             updateMenu();
-            if (getCurrentTab() === 'map') renderTab('map');
-            else {
-                const container = document.getElementById('dynamicContent');
-                const msg = document.createElement('div');
-                msg.className = 'success-msg';
-                msg.textContent = '[СИСТЕМА] Доступ к карте разблокирован.';
-                container.appendChild(msg);
-                setTimeout(() => msg.remove(), 3000);
-            }
+            const msg = document.createElement('div');
+            msg.className = 'success-msg';
+            msg.textContent = '[СИСТЕМА] Доступ к карте разблокирован.';
+            container.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
+            if (currentTab === 'map') renderTab('map');
         } else if (code === 'CHAT-2026') {
             codesEntered.chat = true;
             updateMenu();
-            if (getCurrentTab() === 'chat') renderTab('chat');
-            else {
-                const container = document.getElementById('dynamicContent');
-                const msg = document.createElement('div');
-                msg.className = 'success-msg';
-                msg.textContent = '[СИСТЕМА] Доступ к чату разблокирован.';
-                container.appendChild(msg);
-                setTimeout(() => msg.remove(), 3000);
-            }
+            const msg = document.createElement('div');
+            msg.className = 'success-msg';
+            msg.textContent = '[СИСТЕМА] Доступ к чату разблокирован.';
+            container.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
+            if (currentTab === 'chat') renderTab('chat');
         } else {
-            // Сообщение об ошибке от терминала
-            const container = document.getElementById('dynamicContent');
             const msg = document.createElement('div');
             msg.className = 'error-msg';
             msg.textContent = '[СИСТЕМА] ACCESS DENIED: Неверный код доступа.';
@@ -381,20 +352,6 @@
         codeInput.value = '';
     });
 
-    function getCurrentTab() {
-        const activeMenuItem = document.querySelector('.menu-item[data-tab]');
-        // более точный метод: найдём активный tab по классу locked? Нет, проще хранить переменную
-        let current = 'terminal';
-        const items = document.querySelectorAll('.menu-item');
-        items.forEach(item => {
-            if (item.classList.contains('active-tab')) {
-                current = item.getAttribute('data-tab');
-            }
-        });
-        return current;
-    }
-
-    // Отслеживание выбора меню
     const menuItems = document.querySelectorAll('.menu-item');
     menuItems.forEach(item => {
         item.addEventListener('click', () => {
@@ -407,7 +364,6 @@
                 setTimeout(() => msg.remove(), 3000);
                 return;
             }
-            // Убираем класс active-tab со всех
             menuItems.forEach(mi => mi.classList.remove('active-tab'));
             item.classList.add('active-tab');
             const tabId = item.getAttribute('data-tab');
@@ -415,7 +371,6 @@
         });
     });
 
-    // По умолчанию выбираем терминал
     document.querySelector('.menu-item[data-tab="terminal"]').classList.add('active-tab');
     renderTab('terminal');
 </script>
