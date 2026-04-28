@@ -252,20 +252,20 @@
                     const mapContainer = document.getElementById('map-container');
                     if (mapContainer) {
                         map = L.map('map-container').setView([45.0, 10.0], 3);
-                        // Слой карты без стандартной атрибуции
                         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                             attribution: false,
                             subdomains: 'abcd',
                             maxZoom: 19
                         }).addTo(map);
 
-                        // Метки
+                        // ========== ИСПРАВЛЕННЫЙ СПИСОК МЕТОК ==========
                         const locations = [
                             { lat: 42.0, lng: 21.0, type: 'anomaly', title: 'Бета-01 (операция "Кукольник")', desc: 'Балканы, 1998. Первый контакт.' },
-                            { lat: 48.0, lng: -30.0, type: 'anomaly', title: 'Гамма-04', desc: 'Северная Атлантика. Аномалия изолирована.' },
+                            { lat: 48.0, lng: -30.0, type: 'anomaly', title: 'Гамма-04', desc: 'Северная Атлантика. Аномалия изолирована, 2002.' },
                             { lat: 46.2, lng: 6.15, type: 'event', title: 'Основание STABILIS', desc: 'Женева, 1986.' },
-                            { lat: 41.9, lng: 12.5, type: 'event', title: 'Операция "Тихая пристань"', desc: 'Рим, 2019.' },
-                            { lat: 55.75, lng: 37.62, type: 'event', title: 'Внедрение агента Ауспиций', desc: 'Москва.' }
+                            { lat: 41.9, lng: 12.5, type: 'event', title: 'Операция "Спокойное море"', desc: 'Рим, 2006. Логистическая операция Артерии.' },
+                            { lat: 55.75, lng: 37.62, type: 'event', title: 'Внедрение агента Ауспиций', desc: 'Москва, 2004.' },
+                            { lat: 52.52, lng: 13.40, type: 'event', title: 'Операция "Зеркало"', desc: 'Берлин, 2005. Внедрение в телекоммуникационную сеть.' }
                         ];
                         locations.forEach(loc => {
                             const markerColor = loc.type === 'anomaly' ? 'red' : '#0F0';
@@ -278,7 +278,6 @@
                             marker.bindPopup(`<b>${loc.title}</b><br>${loc.desc}`);
                         });
 
-                        // Кастомная атрибуция
                         let customAttr = L.control({ position: 'bottomright' });
                         customAttr.onAdd = function(map) {
                             let div = L.DomUtil.create('div', 'custom-attribution');
