@@ -3,44 +3,366 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STB-ARCHIVE // ACCESS TERMINAL</title>
-    <link rel="stylesheet" href="style.css">
+    <title>STB-ARCHIVE // ТЕРМИНАЛ ДОСТУПА</title>
+    <!-- Leaflet для карты -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: radial-gradient(circle at center, #021C02 0%, #000000 100%);
+            color: #0F0;
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .terminal {
+            width: 1200px;
+            max-width: 95vw;
+            height: 90vh;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid #0F0;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        /* Верхняя панель */
+        .header {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px dashed #0F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            background: #000;
+        }
+        .logo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .access-area {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .access-area input {
+            background: #000;
+            border: 1px solid #0F0;
+            color: #0F0;
+            padding: 0.3rem 0.6rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .access-area button {
+            background: #0F0;
+            border: none;
+            color: #000;
+            font-weight: bold;
+            padding: 0.3rem 1rem;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        /* Основное тело: меню слева, контент справа */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .menu {
+            width: 200px;
+            border-right: 1px dashed #0F0;
+            padding: 1rem 0;
+            background: #000;
+        }
+        .menu-item {
+            padding: 0.6rem 1rem;
+            margin: 0.2rem 0;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: 0.2s;
+        }
+        .menu-item:hover {
+            background: #0F0;
+            color: #000;
+            border-left-color: #0F0;
+        }
+        .menu-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: blur(0.5px);
+        }
+        .content {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #021C02;
+        }
+        .footer {
+            padding: 0.5rem;
+            border-top: 1px dashed #0F0;
+            font-size: 0.7rem;
+            text-align: center;
+            background: #000;
+        }
+        /* Стили для вкладок внутри контента */
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        /* Карта */
+        #map-container {
+            height: 400px;
+            width: 100%;
+            margin-top: 1rem;
+            border: 1px solid #0F0;
+        }
+        /* Чат (имитация) */
+        .chat-log {
+            background: #000;
+            border: 1px solid #0F0;
+            height: 300px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+        }
+        .chat-message {
+            margin-bottom: 0.5rem;
+            border-bottom: 1px dashed #0F0;
+        }
+        .doc-link {
+            color: #0F0;
+            text-decoration: none;
+            border-bottom: 1px dotted #0F0;
+        }
+    </style>
 </head>
 <body>
-<!-- 
-  [SYSTEM NOTE] 
-  Техник-куратор: Если вы это видите, значит, вы на верном пути.
-  Настоящий архив находится за пределами этого домена.
-  Ищите сдвиги в спектре.
-  Техник STB-045, 2026/04/24
--->
 <div class="terminal">
-    <div class="ascii-logo">
-        <pre>
-  _________        .__    .___      .__  .__   
- /   _____/ ____   |  |   |   |    _|__| |  |  
- \_____  \ /  _ \  |  |   |   |   /  ___| |  |  
- /        (  <_> ) |  |__ |   |___\___ \ |  |__
-/_______  /\____/  |____/ |_______/____  >|____/
-        \/                             \/       
-        </pre>
+    <div class="header">
+        <div class="logo">STB-ARCHIVE // УДАЛЁННЫЙ ТЕРМИНАЛ v.4.2.1</div>
+        <div class="access-area">
+            <input type="text" id="globalCode" placeholder="[ ACCESS CODE ]" autocomplete="off">
+            <button id="authBtn">АКТИВИРОВАТЬ</button>
+        </div>
     </div>
-    <div class="glitch">STB-ARCHIVE // RESTRICTED ACCESS</div>
-    <div class="sub">Введите код доступа, полученный из полевых файлов.</div>
-    <div class="input-area">
-        <input type="text" id="accessCode" placeholder="[ ACCESS CODE ]" autocomplete="off">
-        <button id="authBtn">AUTHENTICATE</button>
+    <div class="main-layout">
+        <div class="menu">
+            <div class="menu-item" data-tab="terminal">ТЕРМИНАЛ</div>
+            <div class="menu-item" data-tab="archive" id="archiveLocked">АРХИВ (ДОКУМЕНТЫ)</div>
+            <div class="menu-item" data-tab="map" id="mapLocked">КАРТА УГРОЗ</div>
+            <div class="menu-item" data-tab="chat" id="chatLocked">КАНАЛ СВЯЗИ (ЧАТ)</div>
+        </div>
+        <div class="content">
+            <!-- Вкладка Терминал (видна всегда) -->
+            <div id="tab-terminal" class="tab-pane active">
+                <h3>[ СИСТЕМА ОНЛАЙН ]</h3>
+                <p>Добро пожаловать в терминал удалённого доступа STABILIS. Введите код доступа для открытия дополнительных разделов.</p>
+                <p>Доступные команды: <span style="color:#6F6;">HELP, STATUS, CLEAR</span></p>
+                <pre style="margin-top:1rem;">$ &gt; <span id="terminalLine">_</span></pre>
+            </div>
+            <!-- Вкладка Архив (документы) -->
+            <div id="tab-archive" class="tab-pane">
+                <h3>АРХИВ STABILIS // ДОКУМЕНТЫ</h3>
+                <div id="archiveContent">Введите код доступа для просмотра документов.</div>
+            </div>
+            <!-- Вкладка Карта -->
+            <div id="tab-map" class="tab-pane">
+                <h3>ГЛОБАЛЬНАЯ КАРТА УГРОЗ И ОПЕРАЦИЙ</h3>
+                <div id="map-container"></div>
+                <div class="legend" style="margin-top:0.5rem;">
+                    <span style="background:red;">&nbsp;&nbsp;&nbsp;&nbsp;</span> Аномалия &nbsp;&nbsp;
+                    <span style="background:#0F0;">&nbsp;&nbsp;&nbsp;&nbsp;</span> Операция STABILIS
+                </div>
+            </div>
+            <!-- Вкладка Чат -->
+            <div id="tab-chat" class="tab-pane">
+                <h3>КАНАЛ СВЯЗИ // НЕОФИЦИАЛЬНЫЙ ЛОГ</h3>
+                <div id="chatContent" class="chat-log">Доступ ограничен. Введите код доступа.</div>
+            </div>
+        </div>
     </div>
-    <div id="errorMsg" class="error"></div>
-    <div class="footer">
-	Глобальный архив STABILIS. Версия 3.1.7 // Мониторинг активности ведётся.<br>
-    <span style="color: #6F6; font-size: 0.7rem;">Custodes Umbrae — Silentium, Ordo, Lex. Umbra sumus, Lux vos est.</span>
-
+    <div class="footer">СЕАНС ЗАЛОГИРОВАН. АКТИВНОСТЬ МОНИТОРИТСЯ.</div>
 </div>
-<script src="script.js"></script>
-<!-- 
-  [LOG] 2026-04-24 // Последняя проверка: все уровни активны.
-  TODO: убрать этот блок перед выкатом в прод.
--->
+
+<script>
+    // Состояние доступов
+    let codesEntered = {
+        archive: false,   // OLIG-1986
+        map: false,       // KAIROS-01
+        chat: false       // пока не задан
+    };
+
+    // Функция обновления меню (разблокировка)
+    function updateMenu() {
+        const archiveItem = document.getElementById('archiveLocked');
+        const mapItem = document.getElementById('mapLocked');
+        const chatItem = document.getElementById('chatLocked');
+        if (codesEntered.archive) {
+            archiveItem.classList.remove('locked');
+            archiveItem.style.opacity = '1';
+            archiveItem.style.filter = 'none';
+        } else {
+            archiveItem.classList.add('locked');
+        }
+        if (codesEntered.map) {
+            mapItem.classList.remove('locked');
+            mapItem.style.opacity = '1';
+            mapItem.style.filter = 'none';
+        } else {
+            mapItem.classList.add('locked');
+        }
+        if (codesEntered.chat) {
+            chatItem.classList.remove('locked');
+            chatItem.style.opacity = '1';
+            chatItem.style.filter = 'none';
+        } else {
+            chatItem.classList.add('locked');
+        }
+    }
+
+    // Загрузка контента для архива (документ level1.html)
+    function loadArchiveContent() {
+        const archiveDiv = document.getElementById('archiveContent');
+        archiveDiv.innerHTML = '<div style="color:#6F6;">Загрузка...</div>';
+        // Эмулируем загрузку документа (можно загрузить реальный level1.html через fetch)
+        fetch('level1.html')
+            .then(response => {
+                if (!response.ok) throw new Error('Документ не найден');
+                return response.text();
+            })
+            .then(html => {
+                // Извлекаем содержимое .document из полученного HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const content = doc.querySelector('.document') || doc.querySelector('.terminal');
+                archiveDiv.innerHTML = content ? content.innerHTML : '<p>Документ повреждён.</p>';
+            })
+            .catch(err => {
+                archiveDiv.innerHTML = `<p>Ошибка загрузки документа: ${err.message}</p>`;
+            });
+    }
+
+    // Инициализация карты (вызывается при разблокировке)
+    let mapInitialized = false;
+    function initMap() {
+        if (mapInitialized) return;
+        const container = document.getElementById('map-container');
+        if (!container) return;
+        const map = L.map('map-container').setView([45.0, 10.0], 3);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OSM & CartoDB',
+            subdomains: 'abcd'
+        }).addTo(map);
+        // Добавляем точки
+        const locations = [
+            { lat: 45.56, lng: 7.26, type: 'anomaly', title: 'Гамма-04', desc: 'Подводный объект. Северная Атлантика. Изолирован.' },
+            { lat: 51.0, lng: 30.0, type: 'anomaly', title: 'Бета-12', desc: 'Чернобыльская зона. Периодическая активность.' },
+            { lat: 42.0, lng: 21.0, type: 'anomaly', title: 'Бета-01', desc: 'Балканы, 1998. Первый контакт.' },
+            { lat: 46.2, lng: 6.15, type: 'event', title: 'Основание STABILIS', desc: 'Женева, 1986.' },
+            { lat: 41.9, lng: 12.5, type: 'event', title: 'Операция "Тихая пристань"', desc: 'Рим, 2019.' }
+        ];
+        locations.forEach(loc => {
+            const markerColor = loc.type === 'anomaly' ? 'red' : '#0F0';
+            const icon = L.divIcon({
+                html: `<div style="background:${markerColor}; width:12px; height:12px; border-radius:50%; border:1px solid white;"></div>`,
+                iconSize: [14,14],
+                popupAnchor: [0,-5]
+            });
+            const marker = L.marker([loc.lat, loc.lng], { icon }).addTo(map);
+            marker.bindPopup(`<b>${loc.title}</b><br>${loc.desc}`);
+        });
+        // Стилизация попапов
+        const style = document.createElement('style');
+        style.textContent = `.leaflet-popup-content-wrapper { background: black; color: #0F0; border:1px solid #0F0; font-family: monospace; }`;
+        document.head.appendChild(style);
+        mapInitialized = true;
+    }
+
+    // Чат (статические сообщения)
+    function loadChat() {
+        const chatDiv = document.getElementById('chatContent');
+        chatDiv.innerHTML = `
+            <div class="chat-message">[2026-04-28 14:23] tech_045: Кто-нибудь понимает, почему архив опять недоступен?</div>
+            <div class="chat-message">[2026-04-28 14:25] arch_41: Загружаем резервные копии. Ждите.</div>
+            <div class="chat-message">[2026-04-28 14:30] kairos_07: Операция "Кукольник" — до сих пор кошмары.</div>
+            <div class="chat-message">[2026-04-28 14:32] auspex_03: Есть инсайд: готовится Красная Директива.</div>
+        `;
+    }
+
+    // Обработка ввода глобального кода
+    document.getElementById('authBtn').addEventListener('click', () => {
+        const code = document.getElementById('globalCode').value.trim().toUpperCase();
+        if (code === 'OLIG-1986') {
+            codesEntered.archive = true;
+            updateMenu();
+            loadArchiveContent();
+            // Если архивная вкладка активна — сразу показываем
+            if (document.querySelector('.menu-item[data-tab="archive"].locked') === null) {
+                // переключаем на архив при желании
+            }
+        } else if (code === 'KAIROS-01') {
+            codesEntered.map = true;
+            updateMenu();
+            initMap();
+        } else if (code === 'CHAT-2026') {  // код для чата (выдуманный, потом заменишь)
+            codesEntered.chat = true;
+            updateMenu();
+            loadChat();
+        } else {
+            alert('ДОСТУП ЗАПРЕЩЁН');
+        }
+        document.getElementById('globalCode').value = '';
+    });
+
+    // Переключение вкладок
+    const menuItems = document.querySelectorAll('.menu-item');
+    const panes = document.querySelectorAll('.tab-pane');
+    menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+            if (item.classList.contains('locked')) {
+                // показываем сообщение о необходимости кода
+                alert('Раздел заблокирован. Введите код доступа в верхнем поле.');
+                return;
+            }
+            const tabId = item.getAttribute('data-tab');
+            panes.forEach(pane => pane.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            // Если карта и ещё не инициализирована
+            if (tabId === 'map' && codesEntered.map && !mapInitialized) {
+                initMap();
+            }
+            if (tabId === 'chat' && codesEntered.chat) {
+                // убедимся что чат загружен
+                if (document.getElementById('chatContent').innerHTML.includes('Доступ ограничен')) loadChat();
+            }
+            if (tabId === 'archive' && codesEntered.archive) {
+                if (document.getElementById('archiveContent').innerHTML.includes('Введите код')) loadArchiveContent();
+            }
+        });
+    });
+
+    // маленькая имитация командной строки в Терминале (необязательно)
+    const terminalLine = document.getElementById('terminalLine');
+    if (terminalLine) {
+        let i = 0;
+        const commands = ['help', 'status', 'connect'];
+        setInterval(() => {
+            i = (i+1)%commands.length;
+            terminalLine.innerText = commands[i];
+        }, 3000);
+    }
+</script>
 </body>
 </html>
