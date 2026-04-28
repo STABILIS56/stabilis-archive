@@ -26,6 +26,7 @@ const simpleCodes = {
     "FER-67": "level4.html",
     "AUSPEX-22": "level5.html",
     "FER-KAI": "level6.html"
+	"GLOBAL-01": "global_forecast.html",
 };
 
 const comboMap = {
