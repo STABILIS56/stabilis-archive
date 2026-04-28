@@ -16,34 +16,416 @@ if (!mapInitialized) {
         { lat: 55.75, lng: 37.62, type: 'event', title: 'Внедрение агента Ауспиций', desc: 'Москва.' }
     ];
 
-    // ... цикл добавления меток (оставь как есть) ...
+  <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STB-ARCHIVE // ТЕРМИНАЛ ДОСТУПА</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: radial-gradient(circle at center, #021C02 0%, #000000 100%);
+            color: #0F0;
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .terminal {
+            width: 1200px;
+            max-width: 95vw;
+            height: 90vh;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #0F0;
+            box-shadow: 0 0 20px rgba(0,255,0,0.2);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .header {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px dashed #0F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            background: #000;
+        }
+        .logo { font-size: 1.2rem; font-weight: bold; letter-spacing: 2px; }
+        .access-area { display: flex; gap: 0.5rem; }
+        .access-area input {
+            background: #000;
+            border: 1px solid #0F0;
+            color: #0F0;
+            padding: 0.3rem 0.6rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .access-area button {
+            background: #0F0;
+            border: none;
+            color: #000;
+            font-weight: bold;
+            padding: 0.3rem 1rem;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .menu {
+            width: 200px;
+            border-right: 1px dashed #0F0;
+            padding: 1rem 0;
+            background: #000;
+        }
+        .menu-item {
+            padding: 0.6rem 1rem;
+            margin: 0.2rem 0;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: 0.2s;
+        }
+        .menu-item:hover {
+            background: #0F0;
+            color: #000;
+            border-left-color: #0F0;
+        }
+        .menu-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: blur(0.5px);
+        }
+        .content {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #021C02;
+        }
+        .footer {
+            padding: 0.5rem;
+            border-top: 1px dashed #0F0;
+            font-size: 0.7rem;
+            text-align: center;
+            background: #000;
+        }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+        #map-container {
+            height: 400px;
+            width: 100%;
+            margin-top: 1rem;
+            border: 1px solid #0F0;
+            background: #000;
+        }
+        .chat-log {
+            background: #000;
+            border: 1px solid #0F0;
+            height: 300px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+        }
+        .chat-message {
+            margin-bottom: 0.5rem;
+            border-bottom: 1px dashed #0F0;
+        }
+        .log-line {
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-bottom: 0.2rem;
+        }
+        .error-msg {
+            color: #F44;
+            margin: 0.5rem 0;
+            font-weight: bold;
+        }
+        .success-msg {
+            color: #0F0;
+            margin: 0.5rem 0;
+        }
+        .legend span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        /* Скрываем стандартную атрибуцию Leaflet/OSM */
+        .leaflet-control-attribution {
+            display: none !important;
+        }
+        /* Стиль для нашей кастомной атрибуции */
+        .custom-attribution {
+            font-size: 8px;
+            background-color: rgba(0,0,0,0.7);
+            color: #0F0;
+            font-family: monospace;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #0F0;
+            pointer-events: none;
+        }
+        .custom-attribution a, .custom-attribution a:visited {
+            color: #0F0;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="terminal">
+    <div class="header">
+        <div class="logo">STB-ARCHIVE // УДАЛЁННЫЙ ТЕРМИНАЛ v.4.2.1</div>
+        <div class="access-area">
+            <input type="text" id="globalCode" placeholder="[ ACCESS CODE ]" autocomplete="off">
+            <button id="authBtn">АКТИВИРОВАТЬ</button>
+        </div>
+    </div>
+    <div class="main-layout">
+        <div class="menu">
+            <div class="menu-item" data-tab="terminal">ТЕРМИНАЛ</div>
+            <div class="menu-item" data-tab="archive" id="archiveLocked">АРХИВ (ДОКУМЕНТЫ)</div>
+            <div class="menu-item" data-tab="map" id="mapLocked">КАРТА УГРОЗ</div>
+            <div class="menu-item" data-tab="chat" id="chatLocked">КАНАЛ СВЯЗИ (ЧАТ)</div>
+        </div>
+        <div class="content" id="dynamicContent"></div>
+    </div>
+    <div class="footer">СЕАНС ЗАЛОГИРОВАН. АКТИВНОСТЬ МОНИТОРИТСЯ.</div>
+</div>
 
-    // ========== НОВАЯ АТРИБУЦИЯ (ВПИСАННАЯ В ЛОР) ==========
-    // Создаём свой контрол атрибуции в стиле STABILIS
-    let customAttr = L.control({ position: 'bottomright' });
-    customAttr.onAdd = function(map) {
-        let div = L.DomUtil.create('div', 'custom-attribution');
-        div.innerHTML = 'Картографические данные: Сектор STB-ANALYTICS (OpenStreetMap) • ODbL';
-        div.style.fontSize = '8px';
-        div.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        div.style.color = '#0F0';
-        div.style.fontFamily = 'monospace';
-        div.style.padding = '2px 6px';
-        div.style.borderRadius = '4px';
-        div.style.border = '1px solid #0F0';
-        div.style.pointerEvents = 'none';
-        return div;
-    };
-    customAttr.addTo(map);
+<script>
+    let codesEntered = { archive: false, map: false, chat: false };
+    let mapInitialized = false;
+    let map = null;
+    let currentTab = 'terminal';
 
-    const style = document.createElement('style');
-    style.textContent = `
-        .leaflet-control-attribution { display: none !important; }
-        .custom-attribution a, .custom-attribution a:visited { color: #0F0; text-decoration: none; }
-        .leaflet-popup-content-wrapper { background: black; color: #0F0; border:1px solid #0F0; font-family: monospace; }
-        .leaflet-popup-tip { background: black; }
-    `;
-    document.head.appendChild(style);
-    mapInitialized = true;
-}
-// =============== КОНЕЦ НОВОГО БЛОКА ===============
+    function showLoader(container, callback) {
+        let lines = ["[SYSTEM] Инициализация модуля...", "[SYSTEM] Проверка прав доступа...", "[SYSTEM] Загрузка данных..."];
+        let i = 0;
+        container.innerHTML = "";
+        const interval = setInterval(() => {
+            if (i < lines.length) {
+                const div = document.createElement('div');
+                div.className = 'log-line';
+                div.textContent = lines[i];
+                container.appendChild(div);
+                i++;
+            } else {
+                clearInterval(interval);
+                setTimeout(() => { container.innerHTML = ""; callback(container); }, 300);
+            }
+        }, 400);
+    }
+
+    function renderTab(tabId) {
+        const container = document.getElementById('dynamicContent');
+        container.innerHTML = "";
+        currentTab = tabId;
+        if (tabId === 'terminal') {
+            container.innerHTML = `
+                <div class="tab-pane active">
+                    <h3>[ СИСТЕМА ОНЛАЙН ]</h3>
+                    <p>Добро пожаловать в терминал удалённого доступа STABILIS. Введите код доступа для открытия дополнительных разделов.</p>
+                    <p>Доступные команды: HELP, STATUS, CLEAR</p>
+                    <pre>$ &gt; _</pre>
+                </div>
+            `;
+        } else if (tabId === 'archive') {
+            if (!codesEntered.archive) {
+                container.innerHTML = `<div class="error-msg">[ДОСТУП ЗАПРЕЩЁН] Требуется код доступа. Введите код в поле вверху.</div>`;
+                return;
+            }
+            showLoader(container, (cont) => {
+                fetch('level1.html')
+                    .then(response => {
+                        if (!response.ok) throw new Error('Документ не найден');
+                        return response.text();
+                    })
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const content = doc.querySelector('.document') || doc.querySelector('.terminal');
+                        cont.innerHTML = `<h3>АРХИВ STABILIS // ДОКУМЕНТЫ</h3>${content ? content.innerHTML : '<p>Документ повреждён.</p>'}<br><a href="javascript:void(0)" onclick="renderTab('archive')" style="color:#0F0;">↻ ОБНОВИТЬ</a>`;
+                    })
+                    .catch(err => {
+                        cont.innerHTML = `<div class="error-msg">Ошибка: ${err.message}. Убедитесь, что level1.html существует.</div>`;
+                    });
+            });
+        } else if (tabId === 'map') {
+            if (!codesEntered.map) {
+                container.innerHTML = `<div class="error-msg">[ДОСТУП ЗАПРЕЩЁН] Требуется код доступа. Введите код в поле вверху.</div>`;
+                return;
+            }
+            showLoader(container, (cont) => {
+                cont.innerHTML = `<h3>ГЛОБАЛЬНАЯ КАРТА УГРОЗ И ОПЕРАЦИЙ</h3><div id="map-container"></div><div class="legend"><span style="background:red;"></span> Аномалия &nbsp; <span style="background:#0F0;"></span> Операция STABILIS</div>`;
+                if (!mapInitialized) {
+                    const mapContainer = document.getElementById('map-container');
+                    if (mapContainer) {
+                        map = L.map('map-container').setView([45.0, 10.0], 3);
+                        // Слой карты без стандартной атрибуции
+                        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                            attribution: false,
+                            subdomains: 'abcd',
+                            maxZoom: 19
+                        }).addTo(map);
+
+                        // Метки
+                        const locations = [
+                            { lat: 42.0, lng: 21.0, type: 'anomaly', title: 'Бета-01 (операция "Кукольник")', desc: 'Балканы, 1998. Первый контакт.' },
+                            { lat: 48.0, lng: -30.0, type: 'anomaly', title: 'Гамма-04', desc: 'Северная Атлантика. Аномалия изолирована.' },
+                            { lat: 46.2, lng: 6.15, type: 'event', title: 'Основание STABILIS', desc: 'Женева, 1986.' },
+                            { lat: 41.9, lng: 12.5, type: 'event', title: 'Операция "Тихая пристань"', desc: 'Рим, 2019.' },
+                            { lat: 55.75, lng: 37.62, type: 'event', title: 'Внедрение агента Ауспиций', desc: 'Москва.' }
+                        ];
+                        locations.forEach(loc => {
+                            const markerColor = loc.type === 'anomaly' ? 'red' : '#0F0';
+                            const icon = L.divIcon({
+                                html: `<div style="background:${markerColor}; width:12px; height:12px; border-radius:50%; border:1px solid white;"></div>`,
+                                iconSize: [14,14],
+                                popupAnchor: [0,-5]
+                            });
+                            const marker = L.marker([loc.lat, loc.lng], { icon }).addTo(map);
+                            marker.bindPopup(`<b>${loc.title}</b><br>${loc.desc}`);
+                        });
+
+                        // Кастомная атрибуция
+                        let customAttr = L.control({ position: 'bottomright' });
+                        customAttr.onAdd = function(map) {
+                            let div = L.DomUtil.create('div', 'custom-attribution');
+                            div.innerHTML = 'Картографические данные: Сектор STB-ANALYTICS (OpenStreetMap) • ODbL';
+                            return div;
+                        };
+                        customAttr.addTo(map);
+
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            .leaflet-popup-content-wrapper { background: black; color: #0F0; border:1px solid #0F0; font-family: monospace; }
+                            .leaflet-popup-tip { background: black; }
+                        `;
+                        document.head.appendChild(style);
+                        mapInitialized = true;
+                    }
+                } else {
+                    setTimeout(() => { if (map) map.invalidateSize(); }, 100);
+                }
+            });
+        } else if (tabId === 'chat') {
+            if (!codesEntered.chat) {
+                container.innerHTML = `<div class="error-msg">[ДОСТУП ЗАПРЕЩЁН] Требуется код доступа. Введите код в поле вверху.</div>`;
+                return;
+            }
+            showLoader(container, (cont) => {
+                cont.innerHTML = `<h3>КАНАЛ СВЯЗИ // НЕОФИЦИАЛЬНЫЙ ЛОГ</h3><div id="chatContent" class="chat-log">Загрузка...</div>`;
+                const chatDiv = document.getElementById('chatContent');
+                if (chatDiv) {
+                    chatDiv.innerHTML = `
+                        <div class="chat-message">[2005-04-12 09:23] tech_045: Сервер опять перегружен. Кто запустил массовый анализ?</div>
+                        <div class="chat-message">[2005-04-12 09:25] arch_41: Это Глобальный Прогноз, новая модель. Ждите.</div>
+                        <div class="chat-message">[2005-04-12 09:30] kairos_07: Помните операцию "Кукольник"? До сих пор кошмары.</div>
+                        <div class="chat-message">[2005-04-12 09:32] auspex_03: Ходят слухи о секторе Umbra-X. Кто-нибудь в курсе?</div>
+                    `;
+                }
+            });
+        }
+    }
+
+    function updateMenu() {
+        const archiveItem = document.getElementById('archiveLocked');
+        const mapItem = document.getElementById('mapLocked');
+        const chatItem = document.getElementById('chatLocked');
+        if (codesEntered.archive) {
+            archiveItem.classList.remove('locked');
+            archiveItem.style.opacity = '1';
+            archiveItem.style.filter = 'none';
+        } else {
+            archiveItem.classList.add('locked');
+        }
+        if (codesEntered.map) {
+            mapItem.classList.remove('locked');
+            mapItem.style.opacity = '1';
+            mapItem.style.filter = 'none';
+        } else {
+            mapItem.classList.add('locked');
+        }
+        if (codesEntered.chat) {
+            chatItem.classList.remove('locked');
+            chatItem.style.opacity = '1';
+            chatItem.style.filter = 'none';
+        } else {
+            chatItem.classList.add('locked');
+        }
+    }
+
+    document.getElementById('authBtn').addEventListener('click', () => {
+        const codeInput = document.getElementById('globalCode');
+        const code = codeInput.value.trim().toUpperCase();
+        const container = document.getElementById('dynamicContent');
+        if (code === 'OLIG-1986') {
+            codesEntered.archive = true;
+            updateMenu();
+            const msg = document.createElement('div');
+            msg.className = 'success-msg';
+            msg.textContent = '[СИСТЕМА] Доступ к архиву разблокирован.';
+            container.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
+            if (currentTab === 'archive') renderTab('archive');
+        } else if (code === 'KAIROS-01') {
+            codesEntered.map = true;
+            updateMenu();
+            const msg = document.createElement('div');
+            msg.className = 'success-msg';
+            msg.textContent = '[СИСТЕМА] Доступ к карте разблокирован.';
+            container.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
+            if (currentTab === 'map') renderTab('map');
+        } else if (code === 'CHAT-2026') {
+            codesEntered.chat = true;
+            updateMenu();
+            const msg = document.createElement('div');
+            msg.className = 'success-msg';
+            msg.textContent = '[СИСТЕМА] Доступ к чату разблокирован.';
+            container.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
+            if (currentTab === 'chat') renderTab('chat');
+        } else {
+            const msg = document.createElement('div');
+            msg.className = 'error-msg';
+            msg.textContent = '[СИСТЕМА] ACCESS DENIED: Неверный код доступа.';
+            container.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
+        }
+        codeInput.value = '';
+    });
+
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+            if (item.classList.contains('locked')) {
+                const container = document.getElementById('dynamicContent');
+                const msg = document.createElement('div');
+                msg.className = 'error-msg';
+                msg.textContent = '[СИСТЕМА] ДОСТУП ЗАПРЕЩЁН. Требуется авторизация. Введите код в верхнем поле.';
+                container.appendChild(msg);
+                setTimeout(() => msg.remove(), 3000);
+                return;
+            }
+            menuItems.forEach(mi => mi.classList.remove('active-tab'));
+            item.classList.add('active-tab');
+            const tabId = item.getAttribute('data-tab');
+            renderTab(tabId);
+        });
+    });
+
+    document.querySelector('.menu-item[data-tab="terminal"]').classList.add('active-tab');
+    renderTab('terminal');
+</script>
+</body>
+</html>
