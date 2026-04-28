@@ -165,9 +165,9 @@
 <body>
 <div class="terminal">
     <div class="header">
-        <div class="logo">STB-ARCHIVE // УДАЛЁННЫЙ ТЕРМИНАЛ v.4.2.1</div>
+        <div class="logo">STB-ARCHIVE // УДАЛЁННЫЙ ТЕРМИНАЛ</div>
         <div class="access-area">
-            <input type="text" id="globalCode" placeholder="[ ACCESS CODE ]" autocomplete="off">
+            <input type="text" id="accessCode" placeholder="[ ACCESS CODE ]" autocomplete="off">
             <button id="authBtn">АКТИВИРОВАТЬ</button>
         </div>
     </div>
@@ -178,235 +178,60 @@
             <div class="menu-item" data-tab="map" id="mapLocked">КАРТА УГРОЗ</div>
             <div class="menu-item" data-tab="chat" id="chatLocked">КАНАЛ СВЯЗИ (ЧАТ)</div>
         </div>
-        <div class="content" id="dynamicContent"></div>
+        <div class="content" id="dynamicContent">
+            <div class="tab-pane active" id="tab-terminal">
+                <h3>[ СИСТЕМА ОНЛАЙН ]</h3>
+                <p>Добро пожаловать в терминал удалённого доступа STABILIS. Введите код доступа для открытия дополнительных разделов.</p>
+                <p>Доступные команды: HELP, STATUS, CLEAR</p>
+                <pre>$ &gt; _</pre>
+            </div>
+            <div class="tab-pane" id="tab-archive">
+                <h3>АРХИВ STABILIS // ДОКУМЕНТЫ</h3>
+                <div id="archiveContent">Введите код доступа для просмотра документов.</div>
+            </div>
+            <div class="tab-pane" id="tab-map">
+                <h3>ГЛОБАЛЬНАЯ КАРТА УГРОЗ И ОПЕРАЦИЙ</h3>
+                <div id="map-container"></div>
+                <div class="legend"><span style="background:red;"></span> Аномалия &nbsp; <span style="background:#0F0;"></span> Операция STABILIS</div>
+            </div>
+            <div class="tab-pane" id="tab-chat">
+                <h3>КАНАЛ СВЯЗИ // НЕОФИЦИАЛЬНЫЙ ЛОГ</h3>
+                <div id="chatContent" class="chat-log">Доступ ограничен. Введите код доступа.</div>
+            </div>
+        </div>
     </div>
     <div class="footer">СЕАНС ЗАЛОГИРОВАН. АКТИВНОСТЬ МОНИТОРИТСЯ.</div>
 </div>
 
+<script src="script.js"></script>
 <script>
-    let codesEntered = { archive: false, map: false, chat: false };
-    let mapInitialized = false;
-    let map = null;
-    let currentTab = 'terminal';
-
-    function showLoader(container, callback) {
-        let lines = ["[SYSTEM] Инициализация модуля...", "[SYSTEM] Проверка прав доступа...", "[SYSTEM] Загрузка данных..."];
-        let i = 0;
-        container.innerHTML = "";
-        const interval = setInterval(() => {
-            if (i < lines.length) {
-                const div = document.createElement('div');
-                div.className = 'log-line';
-                div.textContent = lines[i];
-                container.appendChild(div);
-                i++;
-            } else {
-                clearInterval(interval);
-                setTimeout(() => { container.innerHTML = ""; callback(container); }, 300);
-            }
-        }, 400);
-    }
-
-    function renderTab(tabId) {
-        const container = document.getElementById('dynamicContent');
-        container.innerHTML = "";
-        currentTab = tabId;
-        if (tabId === 'terminal') {
-            container.innerHTML = `
-                <div class="tab-pane active">
-                    <h3>[ СИСТЕМА ОНЛАЙН ]</h3>
-                    <p>Добро пожаловать в терминал удалённого доступа STABILIS. Введите код доступа для открытия дополнительных разделов.</p>
-                    <p>Доступные команды: HELP, STATUS, CLEAR</p>
-                    <pre>$ &gt; _</pre>
-                </div>
-            `;
-        } else if (tabId === 'archive') {
-            if (!codesEntered.archive) {
-                container.innerHTML = `<div class="error-msg">[ДОСТУП ЗАПРЕЩЁН] Требуется код доступа. Введите код в поле вверху.</div>`;
-                return;
-            }
-            showLoader(container, (cont) => {
-                fetch('level1.html')
-                    .then(response => {
-                        if (!response.ok) throw new Error('Документ не найден');
-                        return response.text();
-                    })
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const content = doc.querySelector('.document') || doc.querySelector('.terminal');
-                        cont.innerHTML = `<h3>АРХИВ STABILIS // ДОКУМЕНТЫ</h3>${content ? content.innerHTML : '<p>Документ повреждён.</p>'}<br><a href="javascript:void(0)" onclick="renderTab('archive')" style="color:#0F0;">↻ ОБНОВИТЬ</a>`;
-                    })
-                    .catch(err => {
-                        cont.innerHTML = `<div class="error-msg">Ошибка: ${err.message}. Убедитесь, что level1.html существует.</div>`;
-                    });
-            });
-        } else if (tabId === 'map') {
-            if (!codesEntered.map) {
-                container.innerHTML = `<div class="error-msg">[ДОСТУП ЗАПРЕЩЁН] Требуется код доступа. Введите код в поле вверху.</div>`;
-                return;
-            }
-            showLoader(container, (cont) => {
-                cont.innerHTML = `<h3>ГЛОБАЛЬНАЯ КАРТА УГРОЗ И ОПЕРАЦИЙ</h3><div id="map-container"></div><div class="legend"><span style="background:red;"></span> Аномалия &nbsp; <span style="background:#0F0;"></span> Операция STABILIS</div>`;
-                if (!mapInitialized) {
-                    const mapContainer = document.getElementById('map-container');
-                    if (mapContainer) {
-                        map = L.map('map-container').setView([45.0, 10.0], 3);
-                        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                            attribution: false,
-                            subdomains: 'abcd',
-                            maxZoom: 19
-                        }).addTo(map);
-
-                        // ========== ИСПРАВЛЕННЫЙ СПИСОК МЕТОК ==========
-                        const locations = [
-                            { lat: 42.0, lng: 21.0, type: 'anomaly', title: 'Бета-01 (операция "Кукольник")', desc: 'Балканы, 1998. Первый контакт.' },
-                            { lat: 48.0, lng: -30.0, type: 'anomaly', title: 'Гамма-04', desc: 'Северная Атлантика. Аномалия изолирована, 2002.' },
-                            { lat: 46.2, lng: 6.15, type: 'event', title: 'Основание STABILIS', desc: 'Женева, 1986.' },
-                            { lat: 41.9, lng: 12.5, type: 'event', title: 'Операция "Спокойное море"', desc: 'Рим, 2006. Логистическая операция Артерии.' },
-                            { lat: 55.75, lng: 37.62, type: 'event', title: 'Внедрение агента Ауспиций', desc: 'Москва, 2004.' },
-                            { lat: 52.52, lng: 13.40, type: 'event', title: 'Операция "Зеркало"', desc: 'Берлин, 2005. Внедрение в телекоммуникационную сеть.' }
-                        ];
-                        locations.forEach(loc => {
-                            const markerColor = loc.type === 'anomaly' ? 'red' : '#0F0';
-                            const icon = L.divIcon({
-                                html: `<div style="background:${markerColor}; width:12px; height:12px; border-radius:50%; border:1px solid white;"></div>`,
-                                iconSize: [14,14],
-                                popupAnchor: [0,-5]
-                            });
-                            const marker = L.marker([loc.lat, loc.lng], { icon }).addTo(map);
-                            marker.bindPopup(`<b>${loc.title}</b><br>${loc.desc}`);
-                        });
-
-                        let customAttr = L.control({ position: 'bottomright' });
-                        customAttr.onAdd = function(map) {
-                            let div = L.DomUtil.create('div', 'custom-attribution');
-                            div.innerHTML = 'Картографические данные: Сектор STB-ANALYTICS (OpenStreetMap) • ODbL';
-                            return div;
-                        };
-                        customAttr.addTo(map);
-
-                        const style = document.createElement('style');
-                        style.textContent = `
-                            .leaflet-popup-content-wrapper { background: black; color: #0F0; border:1px solid #0F0; font-family: monospace; }
-                            .leaflet-popup-tip { background: black; }
-                        `;
-                        document.head.appendChild(style);
-                        mapInitialized = true;
-                    }
-                } else {
-                    setTimeout(() => { if (map) map.invalidateSize(); }, 100);
-                }
-            });
-        } else if (tabId === 'chat') {
-            if (!codesEntered.chat) {
-                container.innerHTML = `<div class="error-msg">[ДОСТУП ЗАПРЕЩЁН] Требуется код доступа. Введите код в поле вверху.</div>`;
-                return;
-            }
-            showLoader(container, (cont) => {
-                cont.innerHTML = `<h3>КАНАЛ СВЯЗИ // НЕОФИЦИАЛЬНЫЙ ЛОГ</h3><div id="chatContent" class="chat-log">Загрузка...</div>`;
-                const chatDiv = document.getElementById('chatContent');
-                if (chatDiv) {
-                    chatDiv.innerHTML = `
-                        <div class="chat-message">[2005-04-12 09:23] tech_045: Сервер опять перегружен. Кто запустил массовый анализ?</div>
-                        <div class="chat-message">[2005-04-12 09:25] arch_41: Это Глобальный Прогноз, новая модель. Ждите.</div>
-                        <div class="chat-message">[2005-04-12 09:30] kairos_07: Помните операцию "Кукольник"? До сих пор кошмары.</div>
-                        <div class="chat-message">[2005-04-12 09:32] auspex_03: Ходят слухи о секторе Umbra-X. Кто-нибудь в курсе?</div>
-                    `;
-                }
-            });
-        }
-    }
-
-    function updateMenu() {
-        const archiveItem = document.getElementById('archiveLocked');
-        const mapItem = document.getElementById('mapLocked');
-        const chatItem = document.getElementById('chatLocked');
-        if (codesEntered.archive) {
-            archiveItem.classList.remove('locked');
-            archiveItem.style.opacity = '1';
-            archiveItem.style.filter = 'none';
-        } else {
-            archiveItem.classList.add('locked');
-        }
-        if (codesEntered.map) {
-            mapItem.classList.remove('locked');
-            mapItem.style.opacity = '1';
-            mapItem.style.filter = 'none';
-        } else {
-            mapItem.classList.add('locked');
-        }
-        if (codesEntered.chat) {
-            chatItem.classList.remove('locked');
-            chatItem.style.opacity = '1';
-            chatItem.style.filter = 'none';
-        } else {
-            chatItem.classList.add('locked');
-        }
-    }
-
-    document.getElementById('authBtn').addEventListener('click', () => {
-        const codeInput = document.getElementById('globalCode');
-        const code = codeInput.value.trim().toUpperCase();
-        const container = document.getElementById('dynamicContent');
-        if (code === 'OLIG-1986') {
-            codesEntered.archive = true;
-            updateMenu();
-            const msg = document.createElement('div');
-            msg.className = 'success-msg';
-            msg.textContent = '[СИСТЕМА] Доступ к архиву разблокирован.';
-            container.appendChild(msg);
-            setTimeout(() => msg.remove(), 3000);
-            if (currentTab === 'archive') renderTab('archive');
-        } else if (code === 'KAIROS-01') {
-            codesEntered.map = true;
-            updateMenu();
-            const msg = document.createElement('div');
-            msg.className = 'success-msg';
-            msg.textContent = '[СИСТЕМА] Доступ к карте разблокирован.';
-            container.appendChild(msg);
-            setTimeout(() => msg.remove(), 3000);
-            if (currentTab === 'map') renderTab('map');
-        } else if (code === 'CHAT-2026') {
-            codesEntered.chat = true;
-            updateMenu();
-            const msg = document.createElement('div');
-            msg.className = 'success-msg';
-            msg.textContent = '[СИСТЕМА] Доступ к чату разблокирован.';
-            container.appendChild(msg);
-            setTimeout(() => msg.remove(), 3000);
-            if (currentTab === 'chat') renderTab('chat');
-        } else {
-            const msg = document.createElement('div');
-            msg.className = 'error-msg';
-            msg.textContent = '[СИСТЕМА] ACCESS DENIED: Неверный код доступа.';
-            container.appendChild(msg);
-            setTimeout(() => msg.remove(), 3000);
-        }
-        codeInput.value = '';
-    });
-
+    // Дополнительная логика для вкладок и загрузки контента (не конфликтует с script.js)
+    // Здесь мы просто дополняем, но основная обработка кодов остаётся в script.js.
+    // Чтобы избежать двойного определения, весь код перенесён в script.js.
+    // А этот блок будет отвечать за переключение вкладок.
     const menuItems = document.querySelectorAll('.menu-item');
+    const panes = document.querySelectorAll('.tab-pane');
     menuItems.forEach(item => {
         item.addEventListener('click', () => {
             if (item.classList.contains('locked')) {
                 const container = document.getElementById('dynamicContent');
                 const msg = document.createElement('div');
                 msg.className = 'error-msg';
-                msg.textContent = '[СИСТЕМА] ДОСТУП ЗАПРЕЩЁН. Требуется авторизация. Введите код в верхнем поле.';
+                msg.textContent = '[СИСТЕМА] ДОСТУП ЗАПРЕЩЁН. Требуется авторизация.';
                 container.appendChild(msg);
                 setTimeout(() => msg.remove(), 3000);
                 return;
             }
-            menuItems.forEach(mi => mi.classList.remove('active-tab'));
-            item.classList.add('active-tab');
             const tabId = item.getAttribute('data-tab');
-            renderTab(tabId);
+            panes.forEach(pane => pane.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            if (tabId === 'map' && !window.mapInitialized) {
+                // Инициализация карты (если не инициализирована)
+                if (typeof initGlobalMap === 'function') initGlobalMap();
+            }
         });
     });
-
     document.querySelector('.menu-item[data-tab="terminal"]').classList.add('active-tab');
-    renderTab('terminal');
 </script>
 </body>
 </html>
