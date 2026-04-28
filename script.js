@@ -25,7 +25,7 @@ const simpleCodes = {
     "GAMMA-87": "level3.html",
     "FER-67": "level4.html",
     "AUSPEX-22": "level5.html",
-    "FER-KAI": "level6.html"
+    "FER-KAI": "level6.html",
 	"GLOBAL-01": "global_forecast.html"
 };
 
