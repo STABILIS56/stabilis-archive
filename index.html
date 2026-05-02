@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STB-ARCHIVE // ТЕРМИНАЛ ДОСТУПА</title>
+    <title>Архив «Кобальт» // Оранжевый терминал</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: radial-gradient(circle at center, #021C02 0%, #000000 100%);
-            color: #0F0;
+            background: radial-gradient(circle at center, #2a1a00 0%, #000000 100%);
+            color: #FF6600;
             font-family: 'Courier New', monospace;
             height: 100vh;
             display: flex;
@@ -23,8 +23,8 @@
             max-width: 95vw;
             height: 90vh;
             background: rgba(0, 0, 0, 0.9);
-            border: 1px solid #0F0;
-            box-shadow: 0 0 20px rgba(0,255,0,0.2);
+            border: 2px solid #FF6600;
+            box-shadow: 0 0 20px rgba(255,102,0,0.3);
             border-radius: 8px;
             display: flex;
             flex-direction: column;
@@ -32,26 +32,26 @@
         }
         .header {
             padding: 0.8rem 1rem;
-            border-bottom: 1px dashed #0F0;
+            border-bottom: 1px dashed #FF6600;
             display: flex;
             justify-content: space-between;
             align-items: baseline;
             flex-wrap: wrap;
             background: #000;
         }
-        .logo { font-size: 1.2rem; font-weight: bold; letter-spacing: 2px; }
+        .logo { font-size: 1.2rem; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 4px #FF6600; }
         .access-area { display: flex; gap: 0.5rem; }
         .access-area input {
             background: #000;
-            border: 1px solid #0F0;
-            color: #0F0;
+            border: 1px solid #FF6600;
+            color: #FF6600;
             padding: 0.3rem 0.6rem;
             font-family: monospace;
             font-size: 0.9rem;
             outline: none;
         }
         .access-area button {
-            background: #0F0;
+            background: #FF6600;
             border: none;
             color: #000;
             font-weight: bold;
@@ -66,7 +66,7 @@
         }
         .menu {
             width: 200px;
-            border-right: 1px dashed #0F0;
+            border-right: 1px dashed #FF6600;
             padding: 1rem 0;
             background: #000;
         }
@@ -78,19 +78,19 @@
             transition: 0.2s;
         }
         .menu-item:hover {
-            background: #0F0;
+            background: #FF6600;
             color: #000;
-            border-left-color: #0F0;
+            border-left-color: #FF6600;
         }
         .content {
             flex: 1;
             padding: 1rem;
             overflow-y: auto;
-            background: #021C02;
+            background: #1a0f00;
         }
         .footer {
             padding: 0.5rem;
-            border-top: 1px dashed #0F0;
+            border-top: 1px dashed #FF6600;
             font-size: 0.7rem;
             text-align: center;
             background: #000;
@@ -101,12 +101,12 @@
             height: 400px;
             width: 100%;
             margin-top: 1rem;
-            border: 1px solid #0F0;
+            border: 1px solid #FF6600;
             background: #000;
         }
         .chat-log {
             background: #000;
-            border: 1px solid #0F0;
+            border: 1px solid #FF6600;
             height: 300px;
             overflow-y: auto;
             padding: 0.5rem;
@@ -114,7 +114,7 @@
         }
         .chat-message {
             margin-bottom: 0.5rem;
-            border-bottom: 1px dashed #0F0;
+            border-bottom: 1px dashed #FF6600;
         }
         .legend span {
             display: inline-block;
@@ -123,10 +123,10 @@
             margin-right: 5px;
         }
         .document-box {
-            background: #021C02;
+            background: #1a0f00;
             padding: 1rem;
             margin: 1rem 0;
-            border-left: 4px solid #0F0;
+            border-left: 4px solid #FF6600;
             font-size: 0.9rem;
             line-height: 1.4;
         }
@@ -141,11 +141,11 @@
         .custom-attribution {
             font-size: 8px;
             background-color: rgba(0,0,0,0.7);
-            color: #0F0;
+            color: #FF6600;
             font-family: monospace;
             padding: 2px 6px;
             border-radius: 4px;
-            border: 1px solid #0F0;
+            border: 1px solid #FF6600;
             pointer-events: none;
         }
         table {
@@ -154,7 +154,7 @@
             margin-top: 1rem;
         }
         th, td {
-            border: 1px solid #0F0;
+            border: 1px solid #FF6600;
             padding: 6px;
             text-align: left;
         }
@@ -172,14 +172,14 @@
         }
         .structure-list li {
             margin: 0.5rem 0;
-            border-left: 2px solid #0F0;
+            border-left: 2px solid #FF6600;
             padding-left: 0.8rem;
         }
         .cursor {
             display: inline-block;
             width: 10px;
             height: 1.2rem;
-            background-color: #0F0;
+            background-color: #FF6600;
             vertical-align: middle;
             animation: blink 1s step-end infinite;
         }
@@ -192,7 +192,7 @@
 <body>
 <div class="terminal">
     <div class="header">
-        <div class="logo">STB-ARCHIVE // УДАЛЁННЫЙ ТЕРМИНАЛ</div>
+        <div class="logo">/// АРХИВ «КОБАЛЬТ» ///</div>
         <div class="access-area">
             <input type="text" id="codeInput" placeholder="[ ACCESS CODE ]" autocomplete="off">
             <button id="authBtn">АКТИВИРОВАТЬ</button>
@@ -204,107 +204,92 @@
             <div class="menu-item" data-tab="archive">АРХИВ (ДОКУМЕНТЫ)</div>
             <div class="menu-item" data-tab="operations">ОПЕРАЦИИ</div>
             <div class="menu-item" data-tab="structure">СТРУКТУРА</div>
-            <div class="menu-item" data-tab="map">КАРТА УГРОЗ</div>
+            <div class="menu-item" data-tab="map">КАРТА ПОБЕД</div>
             <div class="menu-item" data-tab="chat">КАНАЛ СВЯЗИ</div>
         </div>
         <div class="content" id="dynamicContent">
             <div id="tab-terminal" class="tab-pane active">
                 <h3>[ СИСТЕМА ОНЛАЙН ]</h3>
-                <p>Добро пожаловать в терминал удалённого доступа STABILIS. Введите код доступа для просмотра архивных документов.</p>
+                <p>Добро пожаловать в независимый архив «Кобальт». Мы публикуем то, что STABILIS скрывает. Введите код доступа для просмотра документов.</p>
                 <p>Доступные команды: HELP, STATUS, CLEAR</p>
                 <pre>$ &gt; <span class="cursor"></span></pre>
             </div>
             <div id="tab-archive" class="tab-pane">
-                <h3>АРХИВ STABILIS // ДОКУМЕНТЫ</h3>
+                <h3>АРХИВ «КОБАЛЬТ» // РАССЕКРЕЧЕННЫЕ ДАННЫЕ</h3>
                 <div id="archiveContent">Введите код доступа для просмотра документов.</div>
             </div>
             <div id="tab-operations" class="tab-pane">
-                <h3>ЖУРНАЛ ОПЕРАЦИЙ STABILIS</h3>
+                <h3>УСПЕШНЫЕ ОПЕРАЦИИ «КОБАЛЬТА»</h3>
                 <table>
-                    <tr><th>Операция</th><th>Дата</th><th>Статус</th><th>Код отчёта</th></tr>
-                    <tr><td>Кровавый чемодан</td><td>2007</td><td style="color:#F44;">Провал (Кобальт)</td><td>STB-401</td></tr>
-                    <tr><td>Кукольник</td><td>1998</td><td style="color:#0F0;">Завершена</td><td>KAIROS-01</td></tr>
-                    <tr><td>Тихая гавань</td><td>2006</td><td style="color:#0F0;">Успех</td><td>STB-402</td></tr>
-                    <tr><td>Зачистка Альфа-33</td><td>2005</td><td style="color:#0F0;">Завершена</td><td>STB-403</td></tr>
-                    <tr><td>Операция "Зеркало"</td><td>2004</td><td style="color:#0F0;">Внедрение</td><td>STB-404</td></tr>
+                    <tr><th>Операция</th><th>Дата</th><th>Результат</th><th>Код отчёта</th></tr>
+                    <tr><td style="color:#0F0;">Кровавый чемодан</td><td>2007</td><td>Конвой STABILIS перехвачен, аномалия спасена</td><td>COBALT-01</td></tr>
+                    <tr><td style="color:#0F0;">Тихая гавань</td><td>2006</td><td>Эвакуация животных-аномалий</td><td>COBALT-02</td></tr>
+                    <tr><td style="color:#0F0;">Парижский щит</td><td>2005</td><td>Предотвращена утечка данных</td><td>COBALT-03</td></tr>
+                    <tr><td style="color:#0F0;">Варненский резонанс</td><td>2004</td><td>Срыв ликвидации объекта</td><td>COBALT-04</td></tr>
                 </table>
-                <div class="footer-note">Введите код в поле выше, чтобы открыть полный отчёт.</div>
+                <div class="footer-note">Введите код, чтобы прочитать подробный отчёт.</div>
             </div>
             <div id="tab-structure" class="tab-pane">
-                <h3>КОМАНДНАЯ СТРУКТУРА STABILIS</h3>
+                <h3>СТРУКТУРА «КОБАЛЬТА»</h3>
                 <ul class="structure-list">
-                    <li><strong>Гептархи (Уровень 0)</strong> – высший совет, личности неизвестны</li>
-                    <li><strong>Архитекторы</strong> – аналитика, Глобальный Прогноз</li>
-                    <li><strong>Легион Кайрос</strong> – точечные операции, ликвидации</li>
-                    <li><strong>Легион Феррум</strong> – силовые подразделения, бронетехника</li>
-                    <li><strong>Легион Ауспиций</strong> – агентура, разведка</li>
-                    <li><strong>Артерия</strong> – логистика, снабжение, тыл</li>
+                    <li><strong>Совет командиров (3 человека)</strong> – анонимное руководство</li>
+                    <li><strong>Полевые отряды</strong> – оперативные группы перехвата</li>
+                    <li><strong>Аналитический отдел «Изумруд»</strong> – расшифровка аномалий</li>
+                    <li><strong>Сеть связных</strong> – конспиративные каналы</li>
+                    <li><strong>Техническая служба</strong> – обслуживание оборудования</li>
                 </ul>
             </div>
             <div id="tab-map" class="tab-pane">
-                <h3>ГЛОБАЛЬНАЯ КАРТА УГРОЗ И ОПЕРАЦИЙ</h3>
+                <h3>КАРТА УСПЕШНЫХ ОПЕРАЦИЙ «КОБАЛЬТА»</h3>
                 <div id="map-container"></div>
-                <div class="legend"><span style="background:red;"></span> Провал (Кобальт) &nbsp; <span style="background:#0F0;"></span> Успех STABILIS</div>
+                <div class="legend"><span style="background:#0F0;"></span> Успешный перехват / спасение</div>
             </div>
             <div id="tab-chat" class="tab-pane">
-                <h3>КАНАЛ СВЯЗИ // НЕОФИЦИАЛЬНЫЙ ЛОГ</h3>
+                <h3>КАНАЛ СВЯЗИ // ОБСУЖДЕНИЯ</h3>
                 <div id="chatContent" class="chat-log">
-                    <div class="chat-message">[2007-04-12 14:23] tech_045: Слышали про операцию "Кровавый чемодан"? Кобальт перехватил конвой.</div>
-                    <div class="chat-message">[2007-04-12 14:27] kairos_07: Да, мы потеряли три машины. Архитекторы готовят отчёт.</div>
-                    <div class="chat-message">[2007-04-12 14:30] auspex_03: Кобальт опубликует свою версию. Эти идиоты всё переврут, как обычно.</div>
+                    <div class="chat-message">[2007-04-13 09:12] оператор: Эхо в безопасности. Спасибо, ребята.</div>
+                    <div class="chat-message">[2007-04-13 09:45] аналитик: STABILIS уже состряпала свою ложь. Ждём их отчёт.</div>
+                    <div class="chat-message">[2007-04-13 10:01] связной: Следующая цель – конвой в Альпах. Готовимся.</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="footer">СЕАНС ЗАЛОГИРОВАН. АКТИВНОСТЬ МОНИТОРИТСЯ.</div>
+    <div class="footer">НЕЗАВИСИМЫЙ АРХИВ // ИНФОРМАЦИЯ ОСВОБОЖДАЕТ</div>
 </div>
 
 <script>
-    const stabilisDocs = {};
+    const cobaltDocs = {};
 
-    stabilisDocs["OLIG-1986"] = {
-        title: "МЕМОРАНДУМ №001 // ОСНОВАНИЕ STABILIS",
-        content: "<strong>Дата:</strong> 1986<br><strong>Место:</strong> Женева, Швейцария.<br><strong>Учредители:</strong> частный пул инвесторов.<br><strong>Цель:</strong> создание независимой структуры для сдерживания аномалий.<br><br>STABILIS финансируется исключительно из частных источников. Официальное прикрытие — Фонд глобальной логистики."
+    cobaltDocs["COBALT-01"] = {
+        title: "ОПЕРАЦИЯ «КРОВАВЫЙ ЧЕМОДАН» // ВЕРСИЯ КОБАЛЬТА",
+        content: "<strong>Дата:</strong> 2007<br><strong>Место:</strong> лесной массив «Тёмная роща»<br><strong>Участники:</strong> отряд быстрого реагирования (8 бойцов)<br><strong>Цель:</strong> перехват конвоя STABILIS, перевозившего разумную аномалию («Эхо») на уничтожение.<br><br><strong>Ход:</strong> Засада, бой, вскрытие контейнера. «Эхо» добровольно покинуло контейнер. Конвой разгромлен, контейнер эвакуирован. Потери «Кобальта»: 5 убитых, 2 раненых. Аномалия спасена и находится в безопасном месте.<br><strong>Потери STABILIS:</strong> не менее 3 убитых, 2 раненых, 1 бронемашина уничтожена.<br><strong>Вывод:</strong> STABILIS врёт о «нестабильности» объектов. Мы будем продолжать спасать тех, кого они обрекают на смерть."
     };
-    stabilisDocs["STB-401"] = {
-        title: "РАПОРТ № 08/К // ОПЕРАЦИЯ «КРОВАВЫЙ ЧЕМОДАН»",
-        content: "<strong>Дата:</strong> 2007<br><strong>Место:</strong> лесной массив, координаты удалены.<br><strong>Обстоятельства:</strong> конвой STABILIS (2 бронемашины, 9 человек) подвергся нападению формирования «Кобальт». Один контейнер с аномальным объектом класса «Альфа» похищен.<br><strong>Потери:</strong> 3 убитых, 2 раненых. Ущерб: 2 млн долларов.<br><strong>Вывод:</strong> Усилить охрану."
+    cobaltDocs["COBALT-02"] = {
+        title: "ОПЕРАЦИЯ «ТИХАЯ ГАВАНЬ» (2006)",
+        content: "Эвакуация трёх разумных животных-аномалий из закрытой лаборатории STABILIS в Шотландии. Все особи здоровы, находятся в заповеднике. Потерь нет."
     };
-    stabilisDocs["KAIROS-01"] = {
-        title: "ОПЕРАЦИЯ «КУКОЛЬНИК» (1998)",
-        content: "Первый контакт с аномалией класса Бета-01. Двое оперативников погибли. Результат: изменение политики сдерживания."
+    cobaltDocs["COBALT-03"] = {
+        title: "ОПЕРАЦИЯ «ПАРИЖСКИЙ ЩИТ» (2005)",
+        content: "Перехват курьера STABILIS с документами о незаконной ликвидации свидетелей. Документы опубликованы. Курьер ликвидирован."
     };
-    stabilisDocs["GAMMA-87"] = {
-        title: "АНОМАЛИЯ ГАММА-04",
-        content: "Северная Атлантика. Статус: изолирована. Уровень угрозы: высокий. Требуется постоянный мониторинг."
+    cobaltDocs["COBALT-04"] = {
+        title: "ОПЕРАЦИЯ «ВАРНЕНСКИЙ РЕЗОНАНС» (2004)",
+        content: "Срыв операции STABILIS по уничтожению аномального объекта «Болотный огонь». Объект эвакуирован в нейтральные воды."
     };
 
-    for (let i = 101; i <= 136; i++) {
-        let code = `STB-${i}`;
-        stabilisDocs[code] = {
-            title: `ДОКУМЕНТ STB-${i} // ОПЕРАТИВНЫЕ ДАННЫЕ`,
-            content: `<strong>Дата:</strong> ${2000 + (i % 10)}<br><strong>Гриф:</strong> Секретно<br><strong>Содержание:</strong> Заглушка. Полный документ будет добавлен после выхода соответствующего видео.<br><br><em>Код доступа: ${code}</em>`
+    for (let i = 5; i <= 10; i++) {
+        let code = `COBALT-0${i}`;
+        cobaltDocs[code] = {
+            title: `ДОКУМЕНТ ${code} // ЗАГОТОВКА`,
+            content: `Заглушка. Полный документ будет добавлен после выхода соответствующего видео. Код: ${code}`
         };
     }
 
-    const locations = [
-        { lat: 46.2, lng: 6.15, type: 'success', title: 'Основание STABILIS', desc: 'Женева, 1986. Успех' },
-        { lat: 42.0, lng: 21.0, type: 'success', title: 'Операция "Кукольник"', desc: 'Первый контакт. Завершена. Код: KAIROS-01' },
-        { lat: 48.5, lng: 9.5, type: 'fail', title: 'Операция "Кровавый чемодан"', desc: 'Перехват Кобальтом, провал. Код: STB-401' },
-        { lat: 51.5, lng: -0.1, type: 'success', title: 'Операция "Тихая гавань"', desc: 'Лондон, 2006. Успешно' },
-        { lat: 55.75, lng: 37.62, type: 'success', title: 'Внедрение агента Ауспиций', desc: 'Москва, 2004' },
-        { lat: 48.85, lng: 2.35, type: 'fail', title: 'Операция "Парижский щит"', desc: 'Утечка данных, Кобальт вмешался' },
-        { lat: 52.52, lng: 13.40, type: 'success', title: 'Операция "Бранденбург"', desc: 'Берлин, 2005' },
-        { lat: 40.41, lng: -3.70, type: 'fail', title: 'Операция "Мадридский узел"', desc: 'Срыв из-за действий Кобальта' },
-        { lat: 50.08, lng: 14.43, type: 'success', title: 'Операция "Пражский кристалл"', desc: 'Прага, 2007' },
-        { lat: 59.32, lng: 18.07, type: 'fail', title: 'Операция "Стокгольмский дождь"', desc: 'Потеря артефакта' },
-        { lat: 45.46, lng: 9.19, type: 'success', title: 'Зачистка Миланского подземелья', desc: '2003' },
-        { lat: 41.90, lng: 12.50, type: 'fail', title: 'Операция "Ватиканский архив"', desc: 'Кобальт похитил документы' },
-        { lat: 54.37, lng: 18.63, type: 'success', title: 'Операция "Балтийский ветер"', desc: 'Гданьск, 2002' },
-        { lat: 43.22, lng: 27.92, type: 'fail', title: 'Операция "Варненский резонанс"', desc: 'Срыв миссии' },
-        { lat: 50.45, lng: 30.52, type: 'success', title: 'Операция "Киевский перекрёсток"', desc: '2005' },
-        { lat: 53.90, lng: 27.56, type: 'fail', title: 'Операция "Минский транзит"', desc: 'Кобальт перехватил груз' },
-        { lat: 47.14, lng: 27.60, type: 'success', title: 'Зачистка аномалии "Яссы"', desc: '2001' }
+    const cobaltLocations = [
+        { lat: 48.5, lng: 9.5, title: 'Кровавый чемодан', desc: 'Перехват конвоя (2007)' },
+        { lat: 55.0, lng: -3.0, title: 'Тихая гавань', desc: 'Эвакуация животных (2006)' },
+        { lat: 48.85, lng: 2.35, title: 'Парижский щит', desc: 'Перехват курьера (2005)' },
+        { lat: 43.22, lng: 27.92, title: 'Варненский резонанс', desc: 'Спасение объекта (2004)' }
     ];
 
     let currentTab = 'terminal';
@@ -312,8 +297,8 @@
 
     function showDocument(code) {
         const archiveDiv = document.getElementById('archiveContent');
-        if (stabilisDocs[code]) {
-            archiveDiv.innerHTML = `<div class="document-box"><h4>${stabilisDocs[code].title}</h4><p>${stabilisDocs[code].content}</p></div>`;
+        if (cobaltDocs[code]) {
+            archiveDiv.innerHTML = `<div class="document-box"><h4>${cobaltDocs[code].title}</h4><p>${cobaltDocs[code].content}</p></div>`;
             return true;
         } else {
             archiveDiv.innerHTML = `<div class="error-msg">ДОСТУП ЗАПРЕЩЁН: Код "${code}" не найден.</div>`;
@@ -323,7 +308,7 @@
 
     document.getElementById('authBtn').addEventListener('click', () => {
         const code = document.getElementById('codeInput').value.trim().toUpperCase();
-        if (stabilisDocs[code]) {
+        if (cobaltDocs[code]) {
             showDocument(code);
             document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
             document.getElementById('tab-archive').classList.add('active');
@@ -364,10 +349,9 @@
                     return div;
                 };
                 customAttr.addTo(map);
-                locations.forEach(loc => {
-                    const color = loc.type === 'fail' ? '#FF4444' : '#0F0';
+                cobaltLocations.forEach(loc => {
                     const icon = L.divIcon({
-                        html: `<div style="background:${color}; width:14px; height:14px; border-radius:50%; border:1px solid white;"></div>`,
+                        html: `<div style="background:#0F0; width:14px; height:14px; border-radius:50%; border:1px solid white;"></div>`,
                         iconSize: [16, 16],
                         popupAnchor: [0, -8]
                     });
@@ -383,8 +367,8 @@
     style.textContent = `
         .leaflet-popup-content-wrapper {
             background: black;
-            color: #0F0;
-            border: 1px solid #0F0;
+            color: #FF6600;
+            border: 1px solid #FF6600;
             font-family: monospace;
         }
         .leaflet-popup-tip {
