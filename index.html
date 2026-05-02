@@ -222,11 +222,11 @@
                 <h3>ЖУРНАЛ ОПЕРАЦИЙ STABILIS</h3>
                 <table>
                     <tr><th>Операция</th><th>Дата</th><th>Статус</th><th>Код отчёта</th></tr>
-                    <tr><td>Кровавый чемодан</td><td>2007</td><td>Потеря конвоя</td><td>STB-401</td></tr>
-                    <tr><td>Кукольник</td><td>1998</td><td>Первый контакт</td><td>KAIROS-01</td></tr>
-                    <tr><td>Тихая гавань</td><td>2006</td><td>Успех</td><td>STB-402</td></tr>
-                    <tr><td>Зачистка Альфа-33</td><td>2005</td><td>Завершена</td><td>STB-403</td></tr>
-                    <tr><td>Операция "Зеркало"</td><td>2004</td><td>Внедрение</td><td>STB-404</td></tr>
+                    <tr><td>Кровавый чемодан</td><td>2007</td><td style="color:#F44;">Провал (Кобальт)</td><td>STB-401</td></tr>
+                    <tr><td>Кукольник</td><td>1998</td><td style="color:#0F0;">Завершена</td><td>KAIROS-01</td></tr>
+                    <tr><td>Тихая гавань</td><td>2006</td><td style="color:#0F0;">Успех</td><td>STB-402</td></tr>
+                    <tr><td>Зачистка Альфа-33</td><td>2005</td><td style="color:#0F0;">Завершена</td><td>STB-403</td></tr>
+                    <tr><td>Операция "Зеркало"</td><td>2004</td><td style="color:#0F0;">Внедрение</td><td>STB-404</td></tr>
                 </table>
                 <div class="footer-note">Введите код в поле выше, чтобы открыть полный отчёт.</div>
             </div>
@@ -244,7 +244,7 @@
             <div id="tab-map" class="tab-pane">
                 <h3>ГЛОБАЛЬНАЯ КАРТА УГРОЗ И ОПЕРАЦИЙ</h3>
                 <div id="map-container"></div>
-                <div class="legend"><span style="background:red;"></span> Аномалия &nbsp; <span style="background:#0F0;"></span> Операция STABILIS</div>
+                <div class="legend"><span style="background:red;"></span> Провал (Кобальт) &nbsp; <span style="background:#0F0;"></span> Успех STABILIS</div>
             </div>
             <div id="tab-chat" class="tab-pane">
                 <h3>КАНАЛ СВЯЗИ // НЕОФИЦИАЛЬНЫЙ ЛОГ</h3>
@@ -279,7 +279,7 @@
         content: "Северная Атлантика. Статус: изолирована. Уровень угрозы: высокий. Требуется постоянный мониторинг."
     };
 
-    for (let i = 101; i <= 138; i++) {
+    for (let i = 101; i <= 136; i++) {
         let code = `STB-${i}`;
         stabilisDocs[code] = {
             title: `ДОКУМЕНТ STB-${i} // ОПЕРАТИВНЫЕ ДАННЫЕ`,
@@ -287,28 +287,25 @@
         };
     }
 
-    function generateLocations() {
-        const locations = [];
-        locations.push(
-            { lat: 42.0, lng: 21.0, type: 'anomaly', title: 'Бета-01 (операция "Кукольник")', desc: 'Код: KAIROS-01' },
-            { lat: 48.0, lng: -30.0, type: 'anomaly', title: 'Гамма-04', desc: 'Код: GAMMA-87' },
-            { lat: 46.2, lng: 6.15, type: 'event', title: 'Основание STABILIS', desc: 'Код: OLIG-1986' },
-            { lat: 55.75, lng: 37.62, type: 'event', title: 'Внедрение агента Ауспиций', desc: 'Код: STB-404' },
-            { lat: 48.5, lng: 9.5, type: 'event', title: 'Операция "Кровавый чемодан"', desc: 'Код: STB-401' }
-        );
-        for (let i = 101; i <= 138; i++) {
-            let lat = (Math.random() * 80) - 40;
-            let lng = (Math.random() * 180) - 90;
-            locations.push({
-                lat: lat,
-                lng: lng,
-                type: 'anomaly',
-                title: `Операция STB-${i}`,
-                desc: `Код доступа: STB-${i}`
-            });
-        }
-        return locations;
-    }
+    const locations = [
+        { lat: 46.2, lng: 6.15, type: 'success', title: 'Основание STABILIS', desc: 'Женева, 1986. Успех' },
+        { lat: 42.0, lng: 21.0, type: 'success', title: 'Операция "Кукольник"', desc: 'Первый контакт. Завершена. Код: KAIROS-01' },
+        { lat: 48.5, lng: 9.5, type: 'fail', title: 'Операция "Кровавый чемодан"', desc: 'Перехват Кобальтом, провал. Код: STB-401' },
+        { lat: 51.5, lng: -0.1, type: 'success', title: 'Операция "Тихая гавань"', desc: 'Лондон, 2006. Успешно' },
+        { lat: 55.75, lng: 37.62, type: 'success', title: 'Внедрение агента Ауспиций', desc: 'Москва, 2004' },
+        { lat: 48.85, lng: 2.35, type: 'fail', title: 'Операция "Парижский щит"', desc: 'Утечка данных, Кобальт вмешался' },
+        { lat: 52.52, lng: 13.40, type: 'success', title: 'Операция "Бранденбург"', desc: 'Берлин, 2005' },
+        { lat: 40.41, lng: -3.70, type: 'fail', title: 'Операция "Мадридский узел"', desc: 'Срыв из-за действий Кобальта' },
+        { lat: 50.08, lng: 14.43, type: 'success', title: 'Операция "Пражский кристалл"', desc: 'Прага, 2007' },
+        { lat: 59.32, lng: 18.07, type: 'fail', title: 'Операция "Стокгольмский дождь"', desc: 'Потеря артефакта' },
+        { lat: 45.46, lng: 9.19, type: 'success', title: 'Зачистка Миланского подземелья', desc: '2003' },
+        { lat: 41.90, lng: 12.50, type: 'fail', title: 'Операция "Ватиканский архив"', desc: 'Кобальт похитил документы' },
+        { lat: 54.37, lng: 18.63, type: 'success', title: 'Операция "Балтийский ветер"', desc: 'Гданьск, 2002' },
+        { lat: 43.22, lng: 27.92, type: 'fail', title: 'Операция "Варненский резонанс"', desc: 'Срыв миссии' },
+        { lat: 50.45, lng: 30.52, type: 'success', title: 'Операция "Киевский перекрёсток"', desc: '2005' },
+        { lat: 53.90, lng: 27.56, type: 'fail', title: 'Операция "Минский транзит"', desc: 'Кобальт перехватил груз' },
+        { lat: 47.14, lng: 27.60, type: 'success', title: 'Зачистка аномалии "Яссы"', desc: '2001' }
+    ];
 
     let currentTab = 'terminal';
     let mapInitialized = false;
@@ -355,7 +352,7 @@
             document.getElementById(`tab-${tabId}`).classList.add('active');
             currentTab = tabId;
             if (tabId === 'map' && !mapInitialized) {
-                const map = L.map('map-container').setView([30, 10], 2);
+                const map = L.map('map-container').setView([48.0, 10.0], 4);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: false,
                     maxZoom: 19
@@ -367,13 +364,12 @@
                     return div;
                 };
                 customAttr.addTo(map);
-                const locations = generateLocations();
                 locations.forEach(loc => {
-                    const color = loc.type === 'anomaly' ? 'red' : '#0F0';
+                    const color = loc.type === 'fail' ? '#FF4444' : '#0F0';
                     const icon = L.divIcon({
-                        html: `<div style="background:${color}; width:12px; height:12px; border-radius:50%; border:1px solid white;"></div>`,
-                        iconSize: [14, 14],
-                        popupAnchor: [0, -5]
+                        html: `<div style="background:${color}; width:14px; height:14px; border-radius:50%; border:1px solid white;"></div>`,
+                        iconSize: [16, 16],
+                        popupAnchor: [0, -8]
                     });
                     L.marker([loc.lat, loc.lng], { icon }).addTo(map).bindPopup(`<b>${loc.title}</b><br>${loc.desc}`);
                 });
