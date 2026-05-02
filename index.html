@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STB-ARCHIVE // ТЕРМИНАЛ STABILIS</title>
+    <title>STB-ARCHIVE // ТЕРМИНАЛ ДОСТУПА</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -23,59 +23,59 @@
             max-width: 95vw;
             height: 90vh;
             background: rgba(0, 0, 0, 0.9);
-            border: 2px solid #0F0;
-            box-shadow: 0 0 25px rgba(0,255,0,0.3);
-            border-radius: 12px;
+            border: 1px solid #0F0;
+            box-shadow: 0 0 20px rgba(0,255,0,0.2);
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
         .header {
             padding: 0.8rem 1rem;
-            border-bottom: 1px solid #0F0;
+            border-bottom: 1px dashed #0F0;
             display: flex;
             justify-content: space-between;
             align-items: baseline;
             flex-wrap: wrap;
             background: #000;
         }
-        .logo { font-size: 1.4rem; font-weight: bold; letter-spacing: 3px; text-shadow: 0 0 4px #0F0; }
+        .logo { font-size: 1.2rem; font-weight: bold; letter-spacing: 2px; }
         .access-area { display: flex; gap: 0.5rem; }
         .access-area input {
             background: #000;
             border: 1px solid #0F0;
             color: #0F0;
-            padding: 0.4rem 0.8rem;
+            padding: 0.3rem 0.6rem;
             font-family: monospace;
             font-size: 0.9rem;
             outline: none;
-            width: 180px;
         }
         .access-area button {
             background: #0F0;
             border: none;
             color: #000;
             font-weight: bold;
-            padding: 0.4rem 1rem;
+            padding: 0.3rem 1rem;
             cursor: pointer;
             font-family: monospace;
-            transition: 0.2s;
         }
-        .access-area button:hover { background: #2F2; box-shadow: 0 0 8px #0F0; }
-        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
         .menu {
-            width: 220px;
-            border-right: 1px solid #0F0;
+            width: 200px;
+            border-right: 1px dashed #0F0;
             padding: 1rem 0;
             background: #000;
         }
         .menu-item {
-            padding: 0.7rem 1rem;
+            padding: 0.6rem 1rem;
             margin: 0.2rem 0;
             cursor: pointer;
             border-left: 3px solid transparent;
             transition: 0.2s;
-            font-weight: bold;
         }
         .menu-item:hover {
             background: #0F0;
@@ -84,13 +84,13 @@
         }
         .content {
             flex: 1;
-            padding: 1.2rem;
+            padding: 1rem;
             overflow-y: auto;
             background: #021C02;
         }
         .footer {
             padding: 0.5rem;
-            border-top: 1px solid #0F0;
+            border-top: 1px dashed #0F0;
             font-size: 0.7rem;
             text-align: center;
             background: #000;
@@ -98,7 +98,7 @@
         .tab-pane { display: none; }
         .tab-pane.active { display: block; }
         #map-container {
-            height: 420px;
+            height: 400px;
             width: 100%;
             margin-top: 1rem;
             border: 1px solid #0F0;
@@ -107,41 +107,40 @@
         .chat-log {
             background: #000;
             border: 1px solid #0F0;
-            height: 320px;
+            height: 300px;
             overflow-y: auto;
-            padding: 0.6rem;
-            font-size: 0.85rem;
+            padding: 0.5rem;
+            font-size: 0.8rem;
         }
         .chat-message {
-            margin-bottom: 0.7rem;
+            margin-bottom: 0.5rem;
             border-bottom: 1px dashed #0F0;
-            padding-bottom: 0.3rem;
         }
         .legend span {
             display: inline-block;
             width: 20px;
             height: 20px;
-            margin-right: 8px;
-            border-radius: 50%;
+            margin-right: 5px;
         }
         .document-box {
             background: #021C02;
-            padding: 1.2rem;
+            padding: 1rem;
             margin: 1rem 0;
-            border-left: 5px solid #0F0;
-            font-size: 0.95rem;
-            line-height: 1.5;
+            border-left: 4px solid #0F0;
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
         .error-msg {
             color: #F44;
-            margin-top: 0.8rem;
+            margin-top: 0.5rem;
             font-weight: bold;
-            text-align: center;
         }
-        .leaflet-control-attribution { display: none !important; }
+        .leaflet-control-attribution {
+            display: none !important;
+        }
         .custom-attribution {
             font-size: 8px;
-            background: rgba(0,0,0,0.8);
+            background-color: rgba(0,0,0,0.7);
             color: #0F0;
             font-family: monospace;
             padding: 2px 6px;
@@ -149,111 +148,170 @@
             border: 1px solid #0F0;
             pointer-events: none;
         }
-        a { color: #0F0; text-decoration: none; border-bottom: 1px dotted; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #0F0;
+            padding: 6px;
+            text-align: left;
+        }
+        th {
+            background: #000;
+        }
+        .footer-note {
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            font-style: italic;
+        }
+        .structure-list {
+            list-style: none;
+            padding-left: 1rem;
+        }
+        .structure-list li {
+            margin: 0.5rem 0;
+            border-left: 2px solid #0F0;
+            padding-left: 0.8rem;
+        }
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2rem;
+            background-color: #0F0;
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
     </style>
 </head>
 <body>
 <div class="terminal">
     <div class="header">
-        <div class="logo">/// STB-ARCHIVE // КОРПОРАТИВНЫЙ ТЕРМИНАЛ ///</div>
+        <div class="logo">STB-ARCHIVE // УДАЛЁННЫЙ ТЕРМИНАЛ</div>
         <div class="access-area">
-            <input type="text" id="codeInput" placeholder="[ ВВЕДИТЕ КОД ]" autocomplete="off">
-            <button id="authBtn">ДОСТУП</button>
+            <input type="text" id="codeInput" placeholder="[ ACCESS CODE ]" autocomplete="off">
+            <button id="authBtn">АКТИВИРОВАТЬ</button>
         </div>
     </div>
     <div class="main-layout">
         <div class="menu">
             <div class="menu-item" data-tab="terminal">ТЕРМИНАЛ</div>
-            <div class="menu-item" data-tab="archive">АРХИВ (40 ДОКУМЕНТОВ)</div>
-            <div class="menu-item" data-tab="map">ГЛОБАЛЬНАЯ КАРТА</div>
-            <div class="menu-item" data-tab="chat">СЛУЖЕБНЫЙ ЧАТ</div>
+            <div class="menu-item" data-tab="archive">АРХИВ (ДОКУМЕНТЫ)</div>
+            <div class="menu-item" data-tab="operations">ОПЕРАЦИИ</div>
+            <div class="menu-item" data-tab="structure">СТРУКТУРА</div>
+            <div class="menu-item" data-tab="map">КАРТА УГРОЗ</div>
+            <div class="menu-item" data-tab="chat">КАНАЛ СВЯЗИ</div>
         </div>
         <div class="content" id="dynamicContent">
-            <!-- Терминал -->
             <div id="tab-terminal" class="tab-pane active">
-                <h3>[ СИСТЕМА STABILIS ОНЛАЙН ]</h3>
-                <p>Добро пожаловать, оператор. Доступ предоставлен в соответствии с вашим уровнем допуска.</p>
-                <p>Для просмотра архивных документов введите код в поле вверху. Коды для 40 документов разбросаны в полевых записях (видео).</p>
-                <p>Справочно: <span style="color:#6F6;">HELP, STATUS, CLEAR</span></p>
-                <pre style="margin-top:1rem;">$ &gt; <span id="cursorBlink">_</span></pre>
+                <h3>[ СИСТЕМА ОНЛАЙН ]</h3>
+                <p>Добро пожаловать в терминал удалённого доступа STABILIS. Введите код доступа для просмотра архивных документов.</p>
+                <p>Доступные команды: HELP, STATUS, CLEAR</p>
+                <pre>$ &gt; <span class="cursor"></span></pre>
             </div>
-            <!-- Архив -->
             <div id="tab-archive" class="tab-pane">
-                <h3>АРХИВ STABILIS // 40 ДОКУМЕНТОВ</h3>
-                <div id="archiveContent">Введите код доступа для открытия документа. После ввода документ появится здесь.</div>
+                <h3>АРХИВ STABILIS // ДОКУМЕНТЫ</h3>
+                <div id="archiveContent">Введите код доступа для просмотра документов.</div>
             </div>
-            <!-- Карта -->
+            <div id="tab-operations" class="tab-pane">
+                <h3>ЖУРНАЛ ОПЕРАЦИЙ STABILIS</h3>
+                <table>
+                    <tr><th>Операция</th><th>Дата</th><th>Статус</th><th>Код отчёта</th></tr>
+                    <tr><td>Кровавый чемодан</td><td>2007</td><td>Потеря конвоя</td><td>STB-401</td></tr>
+                    <tr><td>Кукольник</td><td>1998</td><td>Первый контакт</td><td>KAIROS-01</td></tr>
+                    <tr><td>Тихая гавань</td><td>2006</td><td>Успех</td><td>STB-402</td></tr>
+                    <tr><td>Зачистка Альфа-33</td><td>2005</td><td>Завершена</td><td>STB-403</td></tr>
+                    <tr><td>Операция "Зеркало"</td><td>2004</td><td>Внедрение</td><td>STB-404</td></tr>
+                </table>
+                <div class="footer-note">Введите код в поле выше, чтобы открыть полный отчёт.</div>
+            </div>
+            <div id="tab-structure" class="tab-pane">
+                <h3>КОМАНДНАЯ СТРУКТУРА STABILIS</h3>
+                <ul class="structure-list">
+                    <li><strong>Гептархи (Уровень 0)</strong> – высший совет, личности неизвестны</li>
+                    <li><strong>Архитекторы</strong> – аналитика, Глобальный Прогноз</li>
+                    <li><strong>Легион Кайрос</strong> – точечные операции, ликвидации</li>
+                    <li><strong>Легион Феррум</strong> – силовые подразделения, бронетехника</li>
+                    <li><strong>Легион Ауспиций</strong> – агентура, разведка</li>
+                    <li><strong>Артерия</strong> – логистика, снабжение, тыл</li>
+                </ul>
+            </div>
             <div id="tab-map" class="tab-pane">
-                <h3>ГЛОБАЛЬНАЯ КАРТА ОПЕРАЦИЙ</h3>
+                <h3>ГЛОБАЛЬНАЯ КАРТА УГРОЗ И ОПЕРАЦИЙ</h3>
                 <div id="map-container"></div>
-                <div class="legend"><span style="background:red;"></span> Аномалия <span style="background:#0F0;"></span> Операция STABILIS</div>
+                <div class="legend"><span style="background:red;"></span> Аномалия &nbsp; <span style="background:#0F0;"></span> Операция STABILIS</div>
             </div>
-            <!-- Чат -->
             <div id="tab-chat" class="tab-pane">
-                <h3>СЛУЖЕБНЫЙ КАНАЛ СВЯЗИ // НЕОФИЦИАЛЬНЫЙ</h3>
+                <h3>КАНАЛ СВЯЗИ // НЕОФИЦИАЛЬНЫЙ ЛОГ</h3>
                 <div id="chatContent" class="chat-log">
                     <div class="chat-message">[2007-04-12 14:23] tech_045: Слышали про операцию "Кровавый чемодан"? Кобальт перехватил конвой.</div>
                     <div class="chat-message">[2007-04-12 14:27] kairos_07: Да, мы потеряли три машины. Архитекторы готовят отчёт.</div>
                     <div class="chat-message">[2007-04-12 14:30] auspex_03: Кобальт опубликует свою версию. Эти идиоты всё переврут, как обычно.</div>
-                    <div class="chat-message">[2007-04-14 09:15] arch_41: Назначена проверка периметра. Усилить охрану конвоев.</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="footer">
-        <span> ЗАЛОГИРОВАНО // АКТИВНОСТЬ МОНИТОРИТСЯ</span> &nbsp;|&nbsp;
-        <span style="color:#6F6;">Версия 4.2.7</span>
-    </div>
+    <div class="footer">СЕАНС ЗАЛОГИРОВАН. АКТИВНОСТЬ МОНИТОРИТСЯ.</div>
 </div>
 
 <script>
-    // ----- ГЕНЕРАЦИЯ 40 ДОКУМЕНТОВ STABILIS -----
     const stabilisDocs = {};
 
-    // Базовый документ "Основание"
     stabilisDocs["OLIG-1986"] = {
         title: "МЕМОРАНДУМ №001 // ОСНОВАНИЕ STABILIS",
         content: "<strong>Дата:</strong> 1986<br><strong>Место:</strong> Женева, Швейцария.<br><strong>Учредители:</strong> частный пул инвесторов.<br><strong>Цель:</strong> создание независимой структуры для сдерживания аномалий.<br><br>STABILIS финансируется исключительно из частных источников. Официальное прикрытие — Фонд глобальной логистики."
     };
-    // Документ "Кровавый чемодан" (версия STABILIS)
     stabilisDocs["STB-401"] = {
         title: "РАПОРТ № 08/К // ОПЕРАЦИЯ «КРОВАВЫЙ ЧЕМОДАН»",
         content: "<strong>Дата:</strong> 2007<br><strong>Место:</strong> лесной массив, координаты удалены.<br><strong>Обстоятельства:</strong> конвой STABILIS (2 бронемашины, 9 человек) подвергся нападению формирования «Кобальт». Один контейнер с аномальным объектом класса «Альфа» похищен.<br><strong>Потери:</strong> 3 убитых, 2 раненых. Ущерб: 2 млн долларов.<br><strong>Вывод:</strong> Усилить охрану."
     };
-    // Генерация остальных 38 документов (уникальные коды)
-    const prefixes = ["ARCH", "LOG", "OP", "INT", "FIN", "TECH", "SEC", "GLOB", "LEG", "UMB"];
-    const years = [1990,1995,1998,2000,2002,2005,2007,2008,2009];
-    for (let i = 1; i <= 38; i++) {
-        let code = `STB-${String(100 + i).slice(1)}`; // STB-101 ... STB-138
-        let prefix = prefixes[i % prefixes.length];
-        let year = years[i % years.length];
-        stabilisDocs[code] = {
-            title: `${prefix.toUpperCase()}-${i} // ДОКУМЕНТ STABILIS`,
-            content: `<strong>Дата:</strong> ${year}<br><strong>Отдел:</strong> ${prefix}<br><strong>Содержание:</strong> Оперативные данные. Гриф "Секретно". Подробности будут рассекречены после публикации соответствующего видео.<br><br><em>Код доступа к полному отчёту: ${code}</em>`
-        };
-    }
-    // Добавляем также ссылочные коды для полноты списка (40 документов)
     stabilisDocs["KAIROS-01"] = {
         title: "ОПЕРАЦИЯ «КУКОЛЬНИК» (1998)",
         content: "Первый контакт с аномалией класса Бета-01. Двое оперативников погибли. Результат: изменение политики сдерживания."
     };
     stabilisDocs["GAMMA-87"] = {
         title: "АНОМАЛИЯ ГАММА-04",
-        content: "Северная Атлантика. Статус: изолирована. Уровень угрозы: высокий. Перекрёстные ссылки: см. документ STB-112."
+        content: "Северная Атлантика. Статус: изолирована. Уровень угрозы: высокий. Требуется постоянный мониторинг."
     };
-    // Итого 1+1+38 = 40, плюс 2 дополнительных = 42, но для ровного счёта оставим 40, убрав дубликаты. Упростим: всего 40 ключей.
-    // Удалим лишние, оставим ровно 40 ключей.
-    const finalKeys = Object.keys(stabilisDocs);
-    if (finalKeys.length > 40) {
-        for (let i = 40; i < finalKeys.length; i++) {
-            delete stabilisDocs[finalKeys[i]];
-        }
-    }
-    // Дополнительно добавим ещё 2, чтобы было 40 (уже есть 41? Перепроверим). Просто уверены, что есть 40.
 
-    // ----- ЛОГИКА САЙТА -----
+    for (let i = 101; i <= 138; i++) {
+        let code = `STB-${i}`;
+        stabilisDocs[code] = {
+            title: `ДОКУМЕНТ STB-${i} // ОПЕРАТИВНЫЕ ДАННЫЕ`,
+            content: `<strong>Дата:</strong> ${2000 + (i % 10)}<br><strong>Гриф:</strong> Секретно<br><strong>Содержание:</strong> Заглушка. Полный документ будет добавлен после выхода соответствующего видео.<br><br><em>Код доступа: ${code}</em>`
+        };
+    }
+
+    function generateLocations() {
+        const locations = [];
+        locations.push(
+            { lat: 42.0, lng: 21.0, type: 'anomaly', title: 'Бета-01 (операция "Кукольник")', desc: 'Код: KAIROS-01' },
+            { lat: 48.0, lng: -30.0, type: 'anomaly', title: 'Гамма-04', desc: 'Код: GAMMA-87' },
+            { lat: 46.2, lng: 6.15, type: 'event', title: 'Основание STABILIS', desc: 'Код: OLIG-1986' },
+            { lat: 55.75, lng: 37.62, type: 'event', title: 'Внедрение агента Ауспиций', desc: 'Код: STB-404' },
+            { lat: 48.5, lng: 9.5, type: 'event', title: 'Операция "Кровавый чемодан"', desc: 'Код: STB-401' }
+        );
+        for (let i = 101; i <= 138; i++) {
+            let lat = (Math.random() * 80) - 40;
+            let lng = (Math.random() * 180) - 90;
+            locations.push({
+                lat: lat,
+                lng: lng,
+                type: 'anomaly',
+                title: `Операция STB-${i}`,
+                desc: `Код доступа: STB-${i}`
+            });
+        }
+        return locations;
+    }
+
     let currentTab = 'terminal';
-    let mapInit = false;
+    let mapInitialized = false;
 
     function showDocument(code) {
         const archiveDiv = document.getElementById('archiveContent');
@@ -261,80 +319,83 @@
             archiveDiv.innerHTML = `<div class="document-box"><h4>${stabilisDocs[code].title}</h4><p>${stabilisDocs[code].content}</p></div>`;
             return true;
         } else {
-            archiveDiv.innerHTML = `<div class="error-msg">ДОСТУП ЗАПРЕЩЁН: Код "${code}" не найден или недействителен.</div>`;
+            archiveDiv.innerHTML = `<div class="error-msg">ДОСТУП ЗАПРЕЩЁН: Код "${code}" не найден.</div>`;
             return false;
         }
     }
 
     document.getElementById('authBtn').addEventListener('click', () => {
         const code = document.getElementById('codeInput').value.trim().toUpperCase();
-        const archiveDiv = document.getElementById('archiveContent');
         if (stabilisDocs[code]) {
             showDocument(code);
-            // Переключить на вкладку архива
             document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
             document.getElementById('tab-archive').classList.add('active');
             currentTab = 'archive';
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active-tab'));
+            document.querySelector('.menu-item[data-tab="archive"]').classList.add('active-tab');
         } else {
-            archiveDiv.innerHTML = `<div class="error-msg">ДОСТУП ЗАПРЕЩЁН: Код "${code}" недействителен.</div>`;
-            setTimeout(() => {
-                if (currentTab === 'archive') archiveDiv.innerHTML = "Введите код доступа для просмотра документов.";
-            }, 3000);
+            const archiveDiv = document.getElementById('archiveContent');
+            if (currentTab === 'archive') {
+                archiveDiv.innerHTML = `<div class="error-msg">ДОСТУП ЗАПРЕЩЁН: Код "${code}" недействителен.</div>`;
+                setTimeout(() => {
+                    if (document.getElementById('tab-archive').classList.contains('active'))
+                        archiveDiv.innerHTML = "Введите код доступа для просмотра документов.";
+                }, 3000);
+            } else {
+                alert("Неверный код доступа.");
+            }
         }
         document.getElementById('codeInput').value = '';
     });
 
-    // Переключение вкладок
     document.querySelectorAll('.menu-item').forEach(item => {
         item.addEventListener('click', () => {
             const tabId = item.getAttribute('data-tab');
             document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
             currentTab = tabId;
-            if (tabId === 'map' && !mapInit) {
-                initMap();
-                mapInit = true;
+            if (tabId === 'map' && !mapInitialized) {
+                const map = L.map('map-container').setView([30, 10], 2);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: false,
+                    maxZoom: 19
+                }).addTo(map);
+                let customAttr = L.control({ position: 'bottomright' });
+                customAttr.onAdd = () => {
+                    let div = L.DomUtil.create('div', 'custom-attribution');
+                    div.innerHTML = 'Картографические данные: OpenStreetMap';
+                    return div;
+                };
+                customAttr.addTo(map);
+                const locations = generateLocations();
+                locations.forEach(loc => {
+                    const color = loc.type === 'anomaly' ? 'red' : '#0F0';
+                    const icon = L.divIcon({
+                        html: `<div style="background:${color}; width:12px; height:12px; border-radius:50%; border:1px solid white;"></div>`,
+                        iconSize: [14, 14],
+                        popupAnchor: [0, -5]
+                    });
+                    L.marker([loc.lat, loc.lng], { icon }).addTo(map).bindPopup(`<b>${loc.title}</b><br>${loc.desc}`);
+                });
+                mapInitialized = true;
             }
         });
     });
 
-    function initMap() {
-        const container = document.getElementById('map-container');
-        if (!container) return;
-        const map = L.map('map-container').setView([48.0, 10.0], 4);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: false,
-            maxZoom: 19
-        }).addTo(map);
-        let customAttr = L.control({ position: 'bottomright' });
-        customAttr.onAdd = () => {
-            let div = L.DomUtil.create('div', 'custom-attribution');
-            div.innerHTML = 'Картографические данные: OpenStreetMap';
-            return div;
-        };
-        customAttr.addTo(map);
-        const locations = [
-            { lat: 42.0, lng: 21.0, type: 'anomaly', title: 'Бета-01', desc: 'Балканы, 1998. Первый контакт.' },
-            { lat: 48.0, lng: -30.0, type: 'anomaly', title: 'Гамма-04', desc: 'Северная Атлантика, изолирована.' },
-            { lat: 46.2, lng: 6.15, type: 'event', title: 'Основание STABILIS', desc: 'Женева, 1986.' },
-            { lat: 48.5, lng: 9.5, type: 'event', title: 'Операция "Кровавый чемодан"', desc: 'Лесной массив, 2007.' }
-        ];
-        locations.forEach(loc => {
-            let color = loc.type === 'anomaly' ? 'red' : '#0F0';
-            let icon = L.divIcon({
-                html: `<div style="background:${color}; width:12px; height:12px; border-radius:50%; border:1px solid white;"></div>`,
-                iconSize: [14,14],
-                popupAnchor: [0,-5]
-            });
-            L.marker([loc.lat, loc.lng], { icon }).addTo(map).bindPopup(`<b>${loc.title}</b><br>${loc.desc}`);
-        });
-    }
-
-    // мигающий курсор
-    setInterval(() => {
-        const span = document.getElementById('cursorBlink');
-        if (span) span.style.opacity = (span.style.opacity === '0' ? '1' : '0');
-    }, 500);
+    document.querySelector('.menu-item[data-tab="terminal"]').classList.add('active-tab');
+    const style = document.createElement('style');
+    style.textContent = `
+        .leaflet-popup-content-wrapper {
+            background: black;
+            color: #0F0;
+            border: 1px solid #0F0;
+            font-family: monospace;
+        }
+        .leaflet-popup-tip {
+            background: black;
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 </body>
 </html>
